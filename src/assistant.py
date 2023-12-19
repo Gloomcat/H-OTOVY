@@ -1,5 +1,6 @@
 from contacts_book import ContactsBook
 from notes_manager import NotesManager
+from command_help import command_help
 
 
 class Assistant:
@@ -21,9 +22,11 @@ class Assistant:
                 print("Goodbye, have a nice day :)")
                 break
             # elif: add other commands and according functions
+            elif command == "help":
+                command_help()
             else:
                 print("Please, provide a correct command.")
 
 
 if __name__ == "__main__":
-    pass
+    command_help()
