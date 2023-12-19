@@ -12,6 +12,10 @@ class Assistant:
         cmd = cmd.strip().lower()
         return cmd, *args
 
+    def add_contact(self, args):
+        name, phone_number, email, address, birthday = args
+        self.contacts.add_contact(name, phone_number, email, address, birthday)
+
     def run(self):
         while True:
             user_input = input("Enter a command, please: ")
@@ -21,6 +25,8 @@ class Assistant:
                 print("Goodbye, have a nice day :)")
                 break
             # elif: add other commands and according functions
+            elif command == "add_contact":
+                print(self.add_contact(args))
             else:
                 print("Please, provide a correct command.")
 

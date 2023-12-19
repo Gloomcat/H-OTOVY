@@ -1,3 +1,4 @@
+import re
 from abc import abstractmethod
 
 
@@ -33,6 +34,17 @@ class _Field:
     @abstractmethod
     def validation_fail_msg(self):
         return NotImplemented
+
+
+class Name(_Field):
+    def __init__(self, value):
+        super().__init__(value.lower().capitalize())
+
+    def validation_func(self, value):
+        return re.match("^[a-zA-Z]+$", value)
+
+    def validation_fail_msg(self):
+        return "Name should contain only letters."
 
 
 """
