@@ -1,5 +1,6 @@
 from contacts_book import ContactsBook
 from notes_manager import NotesManager
+from error_handler import input_error_handler
 
 
 class Assistant:
@@ -7,6 +8,7 @@ class Assistant:
         self.contacts = ContactsBook()
         self.notes = NotesManager()
 
+    @input_error_handler
     def _parse_input(self, user_input):
         cmd, *args = user_input.split()
         cmd = cmd.strip().lower()
