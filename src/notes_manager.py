@@ -1,32 +1,60 @@
 from datetime import datetime
+from collections import UserDict, UserList
+from fields import FieldError, Id
 
 
-class Note:
-    def __init__(self, number, content):
-        self.number = number
+class Note(UserDict):
+    def __init__(self, id: int, timestamp: str, content: str):
+        super().__init__()
+        self.data["id"] = None
+        self.data["timestamp"] = None
+        self.data["content"] = None
+        self.id = id
+        self.timestamp = timestamp
         self.content = content
-        self.timestamp = datetime.now()
+
+    @property
+    def id(self):
+        return self.data["id"]
+
+    @id.setter
+    def id(self, id: int):
+        try:
+            self.data["id"] = Id(id)
+        except FieldError as e:
+            raise e
+
+    @property
+    def timestamp(self):
+        return self.data["timestamp"]
+
+    @timestamp.setter
+    def timestamp(self, timestamp: str):
+        self.data["timestamp"] = datetime.strptime(timestamp, "%d.%m.%Y %H:%M:%S")
+
+    @property
+    def content(self):
+        return self.data["content"]
+
+    @content.setter
+    def content(self, content: str):
+        self.data["content"] = content
 
 
-class NotesManager:
-    def __init__(self):
-        self.data = {}
-        self.note_counter = 1
+class NotesManager(UserList):
+    def add_note(self, content: str):
+        id = len(self.data)
+        timestamp = datetime.now().strftime("%d.%m.%Y %H:%M:%S")
+        note = Note(id, timestamp, content)
+        self.data.append(note)
+        return f"Note added with Id: {id} at {note.timestamp}"
 
-    def add_note(self, content):
-        new_note = Note(self.note_counter, content)
-        self.data[self.note_counter] = new_note
-        self.note_counter += 1
-        return f"Note added with number {new_note.number} at {new_note.timestamp.strftime('%d.%m.%Y %H:%M:%S')[:-3]}"
-
-    def find_notes(self, keyword):
-        result_notes = [
-            note
-            for note_id, note in self.data.items()
-            if keyword.lower() in note.content.lower()
-        ]
-        result_strings = [str(note) for note in result_notes]
-        return "\n".join(result_strings)
+    def find_notes(self, keyword: str):
+        result = list(
+            filter(lambda note: keyword.lower() in note.content.lower(), self.data)
+        )
+        # raise according Error from error_handler.py in case the result is empty
+        return result
 
 
 if __name__ == "__main__":

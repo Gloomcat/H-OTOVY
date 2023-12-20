@@ -7,7 +7,7 @@ class FieldError(Exception):
 
 
 class _Field:
-    def __init__(self, value: str):
+    def __init__(self, value):
         self.__value = None
         self.value = value
 
@@ -36,6 +36,14 @@ class _Field:
         return NotImplemented
 
 
+class Id(_Field):
+    def validation_func(self, value):
+        return isinstance(value, int)
+
+    def validation_fail_msg(self):
+        return "Id should be number."
+
+
 class Name(_Field):
     def __init__(self, value):
         super().__init__(value.lower().capitalize())
@@ -46,18 +54,6 @@ class Name(_Field):
     def validation_fail_msg(self):
         return "Name should contain only letters."
 
-
-"""
-All field subclasses have to look like:
-
-class FieldImplementation(_Field)
-    def validation_func():
-        ...
-    def validation_fail_msg(self):
-        ...
-
-FieldError must be processed in case of validation fail.
-"""
 
 if __name__ == "__main__":
     pass

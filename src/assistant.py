@@ -15,13 +15,14 @@ class Assistant:
     def add_contact(self, args):
         name, phone_number, email, address, birthday = args
         self.contacts.add_contact(name, phone_number, email, address, birthday)
+
     def add_note(self, args):
         content = " ".join(args)
-        return self.notes_manager.add_note(content)
+        return self.notes.add_note(content)
 
     def find_notes(self, args):
         keyword = " ".join(args)
-        result = self.notes_manager.find_notes(keyword)
+        result = self.notes.find_notes(keyword)
         return f"Search result: {result}"
 
     def run(self):
@@ -30,7 +31,7 @@ class Assistant:
             command, *args = self._parse_input(user_input)
 
             if command in ["exit", "close"]:
-                print("Goodbye, have a nice day :)")
+                print("Goodbye, have a nice day!")
                 break
             # elif: add other commands and according functions
             elif command == "add_contact":
