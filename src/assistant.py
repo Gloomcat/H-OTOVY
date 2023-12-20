@@ -39,7 +39,7 @@ class Assistant:
         self.formatter.print_greeting(self.WELCOME_MESSAGE)
 
         while True:
-            user_input = input()
+            user_input = input("Enter a command, please: ")
             command, *args = self._parse_input(user_input)
 
             if command in ["exit", "close"]:
