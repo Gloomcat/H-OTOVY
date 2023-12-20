@@ -1,9 +1,16 @@
 from contacts_book import ContactsBook
 from notes_manager import NotesManager
-from command_help import command_help
+from assistant_help import assistant_help
 
 
 class Assistant:
+    WELCOME_MESSAGE = (
+        "Welcome to the Console Assistant!\n"
+        "I am ready to help you manage your contacts and notes.\n"
+        "Type 'help' to see a list of available commands, 'exit' or 'close' to finish the session.\n"
+        "How can I assist you today?"
+    )
+
     def __init__(self):
         self.contacts = ContactsBook()
         self.notes = NotesManager()
@@ -14,6 +21,8 @@ class Assistant:
         return cmd, *args
 
     def run(self):
+        print(self.WELCOME_MESSAGE)
+
         while True:
             user_input = input("Enter a command, please: ")
             command, *args = self._parse_input(user_input)
@@ -23,10 +32,10 @@ class Assistant:
                 break
             # elif: add other commands and according functions
             elif command == "help":
-                command_help()
+                assistant_help()
             else:
                 print("Please, provide a correct command.")
 
 
 if __name__ == "__main__":
-    command_help()
+    assistant_help()
