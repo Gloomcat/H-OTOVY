@@ -1,15 +1,5 @@
-from rich.console import Console
-from rich.table import Table
-
-
 def assistant_help():
-    console = Console()
-    table = Table(show_header=True, header_style="bold magenta")
-
-    table.add_column("Command", style="bold cyan", width=30)
-    table.add_column("Arguments", style="magenta", width=25)
-    table.add_column("Description", style="yellow", width=60)
-
+    headers = {"Command": 30, "Arguments": 25, "Description": 40}
     commands = {
         "add-contact": {
             "args": "<name> <phone>",
@@ -69,7 +59,9 @@ def assistant_help():
         }
     }
 
-    for command, info in commands.items():
-        table.add_row(command, info["args"], info["desc"])
+    transformed_commands = []
 
-    console.print(table)
+    for command, info in commands.items():
+        transformed_commands.append((command, info["args"], info["desc"]))
+
+    return headers, transformed_commands
