@@ -1,6 +1,8 @@
 from datetime import datetime
-from collections import UserDict, UserList
+from collections import UserDict
+
 from fields import FieldError, Id
+from persistant_storage import PersistantStorage
 
 
 class Note(UserDict):
@@ -30,7 +32,7 @@ class Note(UserDict):
 
     @timestamp.setter
     def timestamp(self, timestamp: str):
-        self.data["timestamp"] = datetime.strptime(timestamp, "%d.%m.%Y %H:%M:%S")
+        self.data["timestamp"] = timestamp
 
     @property
     def content(self):
@@ -41,8 +43,14 @@ class Note(UserDict):
         self.data["content"] = content
 
 
-class NotesManager(UserList):
+class NotesManager(PersistantStorage):
+    def __init__(self):
+        super().__init__("notes.csv", ["id", "timestamp", "content"], Note)
+
+    @PersistantStorage.update
     def add_note(self, content: str):
+        if not content:
+            return "Error: Can't add empty note."
         id = len(self.data)
         timestamp = datetime.now().strftime("%d.%m.%Y %H:%M:%S")
         note = Note(id, timestamp, content)

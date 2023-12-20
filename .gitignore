@@ -2,9 +2,14 @@
 __pycache__/
 *.py[cod]
 *$py.class
+
+# venv
 pyvenv.cfg
 requirements.txt
-Scripts
+Scripts/
+
+# assistant data dir
+src/data/
 
 # C extensions
 *.so
