@@ -12,6 +12,9 @@ class Assistant:
         cmd = cmd.strip().lower()
         return cmd, *args
 
+    def add_contact(self, args):
+        name, phone_number, email, address, birthday = args
+        self.contacts.add_contact(name, phone_number, email, address, birthday)
     def add_note(self, args):
         content = " ".join(args)
         return self.notes_manager.add_note(content)
@@ -30,6 +33,8 @@ class Assistant:
                 print("Goodbye, have a nice day :)")
                 break
             # elif: add other commands and according functions
+            elif command == "add_contact":
+                print(self.add_contact(args))
             elif command == "add-note":
                 print(self.add_note(args))
             elif command == "find-notes":
