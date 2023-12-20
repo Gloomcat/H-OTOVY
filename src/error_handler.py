@@ -126,51 +126,51 @@ def error_handler(func):
         try:
             return func(*args, **kwargs)
         except ContactNotFoundError:
-            print("Error: Contact not found.")
+            return "Error: Contact not found."
         except InvalidFormatError:
-            print("Error: Invalid format. Please check your input format.")
+            return "Error: Invalid format. Please check your input format."
         except InvalidCommandArgumentError:
-            print("Error: Invalid command argument. Please provide a valid argument.")
+            return "Error: Invalid command argument. Please provide a valid argument."
         except PhoneIsExistError:
-            print("Error: Phone number already exists. Please use a different phone number.")
+            return "Error: Phone number already exists. Please use a different phone number."
         except InputOutputError:
-            print("Error: Input/output error. There was a problem with input or output operations.")
+            return "Error: Input/output error. There was a problem with input or output operations."
         except IncorrectInputError:
-            print("Error: Incorrect input. Please check your input data.")
+            return "Error: Incorrect input. Please check your input data."
         except InsufficientContactArgumentsError:
-            print("Error: Insufficient arguments in adding contact. Please provide all required information.")
+            return "Error: Insufficient arguments in adding contact. Please provide all required information."
         except ContactExistsError:
-            print("Error: Contact already exists. Please use a different name or ID.")
+            return "Error: Contact already exists. Please use a different name or ID."
         except InsufficientEditContactArgumentsError:
-            print("Error: Insufficient arguments in editing contact. Please provide all required information.")
+            return "Error: Insufficient arguments in editing contact. Please provide all required information."
         except InvalidContactIDError:
-            print("Error: Invalid contact ID. Please provide a valid contact ID.")
+            return "Error: Invalid contact ID. Please provide a valid contact ID."
         except InsufficientDeleteContactArgumentsError:
-            print("Error: Insufficient arguments in deleting contact. Please provide all required information.")
+            return "Error: Insufficient arguments in deleting contact. Please provide all required information."
         except InsufficientNoteArgumentsError:
-            print("Error: Insufficient arguments in note operations. Please provide all required information.")
+            return "Error: Insufficient arguments in note operations. Please provide all required information."
         except InvalidNoteIDError:
-            print("Error: Invalid note ID. Please provide a valid note ID.")
+            return "Error: Invalid note ID. Please provide a valid note ID."
         except InsufficientSearchCriteriaError:
-            print("Error: Insufficient search criteria. Please provide more criteria.")
+            return "Error: Insufficient search criteria. Please provide more criteria."
         except InvalidSearchCriteriaError:
-            print("Error: Invalid search criteria. Please use valid search criteria.")
+            return "Error: Invalid search criteria. Please use valid search criteria."
         except InsufficientTagArgumentsError:
-            print("Error: Insufficient arguments for adding tags. Please provide all required information.")
+            return "Error: Insufficient arguments for adding tags. Please provide all required information."
         except InvalidNoteOrContactIDError:
-            print("Error: Invalid note or contact ID for tagging. Please use valid IDs.")
+            return "Error: Invalid note or contact ID for tagging. Please use valid IDs."
         except TagAdditionError:
-            print("Error: Error during tag addition. Please try again.")
+            return "Error: Error during tag addition. Please try again."
         except InsufficientTagSearchArgumentsError:
-            print("Error: Insufficient tag search arguments. Please provide more criteria.")
+            return "Error: Insufficient tag search arguments. Please provide more criteria."
         except InvalidTagError:
-            print("Error: Invalid tags for search. Please use valid tags.")
+            return "Error: Invalid tags for search. Please use valid tags."
         except TagSearchError:
-            print("Error: Error during tag search. Please try again.")
+            return "Error: Error during tag search. Please try again."
         except InvalidDaysFormatError:
-            print("Error: Invalid days format for upcoming birthdays. Please provide a valid format.")
+            return "Error: Invalid days format for upcoming birthdays. Please provide a valid format."
         except UpcomingBirthdaysError:
-            print("Error: Error during calculation of upcoming birthdays. Please try again.")
+            return "Error: Error during calculation of upcoming birthdays. Please try again."
         except Exception as e:
             return f"An unexpected error occurred: {e}"
 
