@@ -1,5 +1,7 @@
-from collections import UserDict, UserList
+from collections import UserDict
+
 from fields import FieldError, Id, Name
+from persistant_storage import PersistantStorage
 
 
 class Record(UserDict):
@@ -93,8 +95,12 @@ class Record(UserDict):
             raise e
 
 
-class ContactsBook(UserList):
-    def add_contact(self, name, phone, email, birthday, address):
+class ContactsBook(PersistantStorage):
+    def __init__(self):
+        super().__init__("contacts.csv", ["id", "name", "phone", "email", "birthday", "address"], Record)
+
+    @PersistantStorage.update
+    def add_contact(self, name, phone):
         if any(record.phone == phone for record in self.data):
             # raise according Error from error_handler.py in case the phone already exists
             return "Contact with the phone already exists."
@@ -102,7 +108,7 @@ class ContactsBook(UserList):
             # raise according Error from error_handler.py in case the name already exists
             return "Contact with the name already exists."
         id = len(self.data)
-        record = Record(id, name, phone, email, birthday, address)
+        record = Record(id, name, phone)
         self.data.append(record)
         return "Contact added successfully."
 

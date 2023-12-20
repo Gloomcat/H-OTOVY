@@ -1,5 +1,8 @@
+from contacts_book import ContactsBook
+from notes_manager import NotesManager
 from assistant import Assistant
 
 if __name__ == "__main__":
-    assistant_bot = Assistant()
-    assistant_bot.run()
+    with ContactsBook() as contacts, NotesManager() as notes:
+        assistant_bot = Assistant(contacts, notes)
+        assistant_bot.run()

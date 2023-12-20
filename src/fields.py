@@ -38,7 +38,13 @@ class _Field:
 
 class Id(_Field):
     def validation_func(self, value):
-        return isinstance(value, int)
+        if isinstance(value, int):
+            return True
+        try:
+            int(value)
+        except ValueError:
+            return False
+        return True
 
     def validation_fail_msg(self):
         return "Id should be number."
