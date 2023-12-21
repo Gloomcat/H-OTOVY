@@ -1,8 +1,8 @@
 from datetime import datetime
 from collections import UserDict
 
-from .fields import FieldError, Id
-from .storage import PersistantStorage
+from assistant.fields import FieldError, Id
+from assistant.storage import PersistantStorage
 
 
 class Note(UserDict):
