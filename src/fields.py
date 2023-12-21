@@ -1,3 +1,4 @@
+import re
 from abc import abstractmethod
 
 
@@ -6,7 +7,7 @@ class FieldError(Exception):
 
 
 class _Field:
-    def __init__(self, value: str):
+    def __init__(self, value):
         self.__value = None
         self.value = value
 
@@ -35,17 +36,30 @@ class _Field:
         return NotImplemented
 
 
-"""
-All field subclasses have to look like:
+class Id(_Field):
+    def validation_func(self, value):
+        if isinstance(value, int):
+            return True
+        try:
+            int(value)
+        except ValueError:
+            return False
+        return True
 
-class FieldImplementation(_Field)
-    def validation_func():
-        ...
     def validation_fail_msg(self):
-        ...
+        return "Id should be number."
 
-FieldError must be processed in case of validation fail.
-"""
+
+class Name(_Field):
+    def __init__(self, value):
+        super().__init__(value.lower().capitalize())
+
+    def validation_func(self, value):
+        return re.match("^[a-zA-Z]+$", value)
+
+    def validation_fail_msg(self):
+        return "Name should contain only letters."
+
 
 if __name__ == "__main__":
     pass
