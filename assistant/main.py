@@ -33,6 +33,11 @@ class Assistant:
     def edit_phone(self, args):
         id, phone_number = args
         return self.contacts.edit_phone(id, phone_number)
+    
+    @error_handler
+    def edit_email(self, args):
+        id, email = args
+        return self.contacts.edit_email(int(id), email)
 
     @error_handler
     def add_note(self, args):
@@ -81,6 +86,8 @@ def run():
                 formatter.print_info(assistant.add_note(args))
             elif command == "edit-phone":
                 formatter.print_info(assistant.edit_phone(args))
+            elif command == "edit-email":
+                formatter.print_info(assistant.edit_email(args))
             elif command == "find-notes":
                 formatter.print_table(assistant.find_notes(args))
             elif command == "show-notes":
