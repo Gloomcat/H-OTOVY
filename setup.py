@@ -27,7 +27,7 @@ setup(
     install_requires=["rich"],
     entry_points={
         "console_scripts": [
-            "personal-assistant=assistant.assistant:run",
+            "personal-assistant=assistant.main:run",
         ],
     },
 )

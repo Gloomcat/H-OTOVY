@@ -2,8 +2,8 @@ from collections import UserDict, defaultdict
 from datetime import datetime
 import calendar
 
-from .fields import FieldError, Id, Name, Phone
-from .storage import PersistantStorage
+from assistant.fields import FieldError, Id, Name, Phone
+from assistant.storage import PersistantStorage
 
 
 class Record(UserDict):
@@ -130,7 +130,3 @@ class ContactsBook(PersistantStorage):
             return "Error: duplicate id found"
         records[0].phone = phone
         return f"Phone update for contact with Id: {id}"
-
-
-if __name__ == "__main__":
-    pass
