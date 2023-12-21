@@ -21,9 +21,6 @@ setup(
     url="https://github.com/Gloomcat/H-OTOVY",
     python_requires=">=3.7, <4",
     packages=find_packages(),
-    package_data={
-        "assistant": ["*.csv"],
-    },
     install_requires=["rich"],
     entry_points={
         "console_scripts": [

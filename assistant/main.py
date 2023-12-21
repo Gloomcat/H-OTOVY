@@ -1,7 +1,7 @@
-from assistant.contacts import ContactsBook
-from assistant.notes import NotesManager
-from assistant.help import assistant_help
-from assistant.error_handler import input_error_handler, error_handler
+from contacts import ContactsBook
+from notes import NotesManager
+from help import assistant_help
+from error_handler import input_error_handler, error_handler
 
 
 class Assistant:
