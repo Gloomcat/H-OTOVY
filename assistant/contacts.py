@@ -1,7 +1,7 @@
 from collections import UserDict
 
-from assistant.fields import FieldError, Id, Name, Phone
-from assistant.storage import PersistantStorage
+from fields import FieldError, Id, Name, Phone
+from storage import PersistantStorage
 
 
 class Record(UserDict):
