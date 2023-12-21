@@ -64,7 +64,12 @@ class NotesManager(PersistantStorage):
         )
         # raise according Error from error_handler.py in case the result is empty
         return result
-
+    
+    def show_notes(self):
+        if not self.data:
+            return "Error: Notebook is empty"
+        return self.data
+    
 
 if __name__ == "__main__":
     pass
