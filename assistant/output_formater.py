@@ -21,15 +21,16 @@ class OutputFormatter:
         for item in arr:
             self.console.print(f"[yellow]{item}[/yellow]")
 
-    def print_table(self, headers, data):
+    def print_table(self, data):
         column_colors = ["cyan", "magenta", "yellow"]
         header_color = "bold magenta"
+
         table = Table(show_header=True, header_style=header_color)
 
-        for (header, width), color in zip(headers.items(), column_colors):
-            table.add_column(header, style=color, width=width)
+        headers = list(data[0].keys())
 
-        for row in data:
-            table.add_row(*row)
+        for header, color in zip(headers, column_colors):
+            table.add_column(header, style=color)
 
-        self.console.print(table)
+        for item in data:
+            table.add_row(*[str(item[header]) for header in headers])
