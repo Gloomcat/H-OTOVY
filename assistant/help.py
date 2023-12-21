@@ -1,5 +1,5 @@
 def assistant_help():
-    commands = {
+    return [
         {
             "command": "add-contact",
             "arguments": "<name> <phone>",
@@ -70,8 +70,4 @@ def assistant_help():
             "arguments": "<id>",
             "description": "Displays the content of the note with the specified ID."
         }
-    }
-
-    transformed_commands = []
-
-    return transformed_commands
+    ]

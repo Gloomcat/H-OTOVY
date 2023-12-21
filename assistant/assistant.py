@@ -12,6 +12,7 @@ class Assistant:
         "Type 'help' to see a list of available commands, 'exit' or 'close' to finish the session.\n"
         "How can I assist you today?"
     )
+    FAREWELL_MESSAGE = "Goodbye, have a nice day!"
 
     def __init__(self, contacts: ContactsBook, notes: NotesManager):
         self.contacts = contacts
@@ -50,7 +51,7 @@ class Assistant:
 
 def run():
     formatter = OutputFormatter()
-    print(Assistant.WELCOME_MESSAGE)
+    formatter.print_greeting(Assistant.WELCOME_MESSAGE)
     with ContactsBook() as contacts, NotesManager() as notes:
         assistant = Assistant(contacts, notes)
         while True:
@@ -58,11 +59,11 @@ def run():
             command, *args = assistant.parse_input(user_input)
 
             if command in ["exit", "close"]:
-                formatter.print_greeting("Goodbye, have a nice day!")
+                formatter.print_greeting(Assistant.FAREWELL_MESSAGE)
                 break
             # elif: add other commands and according functions
             elif command == "help":
-                formatter.print_table(*assistant_help())
+                formatter.print_table(assistant_help())
             elif command == "add-contact":
                 formatter.print_info(assistant.add_contact(args))
             elif command == "add-note":
@@ -70,7 +71,7 @@ def run():
             elif command == "edit-phone":
                 formatter.print_info(assistant.edit_phone(args))
             elif command == "find-notes":
-                formatter.print_info(assistant.find_notes(args))
+                formatter.print_table(assistant.find_notes(args))
             else:
                 formatter.print_error("Please, provide a correct command.")
 
