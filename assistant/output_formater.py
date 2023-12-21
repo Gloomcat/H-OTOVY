@@ -6,6 +6,10 @@ class OutputFormatter:
     def __init__(self):
         self.console = Console()
 
+    def print_input(self, text):
+        if isinstance(text, str):
+            self.console.print(f"[yellow]{text}[/yellow]")
+
     def print_greeting(self, text):
         if isinstance(text, str):
             self.console.print(f"[bold blue]{text}[/bold blue]")

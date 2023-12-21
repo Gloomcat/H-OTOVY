@@ -43,7 +43,7 @@ class Assistant:
     def find_notes(self, args):
         keyword = " ".join(args)
         result = self.notes.find_notes(keyword)
-        return f"Search result: {result}"
+        return result
 
 
 def run():
@@ -52,7 +52,8 @@ def run():
     with ContactsBook() as contacts, NotesManager() as notes:
         assistant = Assistant(contacts, notes)
         while True:
-            user_input = input("Enter a command, please: ")
+            formatter.print_input("Enter a command, please: ")
+            user_input = input()
             command, *args = assistant.parse_input(user_input)
 
             if command in ["exit", "close"]:

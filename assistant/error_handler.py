@@ -1,4 +1,4 @@
-from .output_formater import OutputFormatter
+from output_formater import OutputFormatter
 
 
 class ContactNotFoundError(Exception):
