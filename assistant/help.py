@@ -1,4 +1,12 @@
 def assistant_help():
+    """
+    Provides a list of available commands and their descriptions for an assistant application.
+
+    This function returns a list of dictionaries, each containing a command, its expected arguments, and a brief description of what the command does.
+
+    Returns:
+        list: A list of dictionaries, each representing a command and its details.
+    """
     return [
         {
             "command": "add-contact",

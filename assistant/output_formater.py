@@ -3,26 +3,68 @@ from rich.table import Table
 
 
 class OutputFormatter:
+    """
+    A class for formatting and displaying output in the console using the 'rich' library.
+
+    This class provides methods to print various types of messages (input prompts, greetings, information, errors) and tables with custom styles.
+
+    Attributes:
+        console (Console): An instance of the Console class from the 'rich' library for formatted console output.
+    """
+
     def __init__(self):
+        """
+        Initializes an OutputFormatter instance with a Console object.
+        """
         self.console = Console()
 
     def print_input(self, text):
+        """
+        Prints an input prompt in yellow color.
+
+        Parameters:
+        text (str): The text to be printed as an input prompt.
+        """
         if isinstance(text, str):
             self.console.print(f"[yellow]{text}[/yellow]")
 
     def print_greeting(self, text):
+        """
+        Prints a greeting message in bold blue color.
+
+        Parameters:
+        text (str): The text to be printed as a greeting message.
+        """
         if isinstance(text, str):
             self.console.print(f"[bold blue]{text}[/bold blue]")
 
     def print_info(self, text):
+        """
+        Prints an informational message in bold green color.
+
+        Parameters:
+        text (str): The text to be printed as an informational message.
+        """
         if isinstance(text, str):
             self.console.print(f"[bold green]{text}[/bold green]")
 
     def print_error(self, error):
+        """
+        Prints an error message in bold red color.
+
+        Parameters:
+        error (str): The text to be printed as an error message.
+        """
         if isinstance(error, str):
             self.console.print(f"[bold red]{error}[/bold red]")
 
     def print_table(self, data):
+        """
+        Prints a table with the provided data.
+
+        Parameters:
+        data (list): A list of dictionaries, where each dictionary represents a row in the table.
+        """
         if isinstance(data, list):
             column_colors = ["cyan", "magenta", "yellow"]
             header_color = "bold magenta"
