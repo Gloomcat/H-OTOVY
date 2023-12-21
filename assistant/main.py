@@ -2,6 +2,7 @@ from contacts import ContactsBook
 from notes import NotesManager
 from help import assistant_help
 from error_handler import input_error_handler, error_handler
+from output_formater import OutputFormatter
 
 
 class Assistant:
@@ -11,6 +12,7 @@ class Assistant:
         "Type 'help' to see a list of available commands, 'exit' or 'close' to finish the session.\n"
         "How can I assist you today?"
     )
+    FAREWELL_MESSAGE = "Goodbye, have a nice day!"
 
     def __init__(self, contacts: ContactsBook, notes: NotesManager):
         self.contacts = contacts
@@ -41,33 +43,35 @@ class Assistant:
     def find_notes(self, args):
         keyword = " ".join(args)
         result = self.notes.find_notes(keyword)
-        return f"Search result: {result}"
+        return result
 
 
 def run():
-    print(Assistant.WELCOME_MESSAGE)
+    formatter = OutputFormatter()
+    formatter.print_greeting(Assistant.WELCOME_MESSAGE)
     with ContactsBook() as contacts, NotesManager() as notes:
         assistant = Assistant(contacts, notes)
         while True:
-            user_input = input("Enter a command, please: ")
+            formatter.print_input("Enter a command, please: ")
+            user_input = input()
             command, *args = assistant.parse_input(user_input)
 
             if command in ["exit", "close"]:
-                print("Goodbye, have a nice day!")
+                formatter.print_greeting(Assistant.FAREWELL_MESSAGE)
                 break
             # elif: add other commands and according functions
             elif command == "help":
-                assistant_help()
+                formatter.print_table(assistant_help())
             elif command == "add-contact":
-                print(assistant.add_contact(args))
+                formatter.print_info(assistant.add_contact(args))
             elif command == "add-note":
-                print(assistant.add_note(args))
+                formatter.print_info(assistant.add_note(args))
             elif command == "edit-phone":
-                print(assistant.edit_phone(args))
+                formatter.print_info(assistant.edit_phone(args))
             elif command == "find-notes":
-                print(assistant.find_notes(args))
+                formatter.print_table(assistant.find_notes(args))
             else:
-                print("Please, provide a correct command.")
+                formatter.print_error("Please, provide a correct command.")
 
 
 if __name__ == "__main__":
