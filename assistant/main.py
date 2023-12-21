@@ -48,6 +48,11 @@ class Assistant:
     @error_handler
     def show_notes(self):
         return self.notes.show_notes()
+    
+    @error_handler
+    def edit_note(self, args):
+        id, new_content = int(args[0]), " ".join(args[1:])
+        return self.notes.edit_note(id, new_content)
 
 
 def run():
@@ -76,6 +81,8 @@ def run():
                 formatter.print_table(assistant.find_notes(args))
             elif command == "show-notes":
                 formatter.print_table(assistant.show_notes())
+            elif command == "edit-note":
+                formatter.print_info(assistant.edit_note(args))
             else:
                 formatter.print_error("Please, provide a correct command.")
 
