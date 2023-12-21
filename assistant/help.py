@@ -71,3 +71,9 @@ def assistant_help():
             "description": "Displays the content of the note with the specified ID."
         }
     ]
+
+def get_command_list():
+    commands = [command["command"] for command in assistant_help()]
+    additional_commands = ['close', 'exit', 'help']
+    commands.extend(additional_commands)
+    return commands

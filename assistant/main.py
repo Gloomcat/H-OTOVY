@@ -1,8 +1,9 @@
 from contacts import ContactsBook
 from notes import NotesManager
-from help import assistant_help
+from help import assistant_help, get_command_list
 from error_handler import input_error_handler, error_handler
 from output_formater import OutputFormatter
+from autocomplete import AutoCompleter
 
 
 class Assistant:
@@ -47,13 +48,14 @@ class Assistant:
 
 
 def run():
+    auto_completer = AutoCompleter(get_command_list())
     formatter = OutputFormatter()
     formatter.print_greeting(Assistant.WELCOME_MESSAGE)
     with ContactsBook() as contacts, NotesManager() as notes:
         assistant = Assistant(contacts, notes)
         while True:
             formatter.print_input("Enter a command, please: ")
-            user_input = input()
+            user_input = auto_completer.get_user_input()
             command, *args = assistant.parse_input(user_input)
 
             if command in ["exit", "close"]:
