@@ -1,8 +1,8 @@
 from datetime import datetime
 from collections import UserDict
 
-from fields import FieldError, Id
-from persistant_storage import PersistantStorage
+from .fields import FieldError, Id
+from .storage import PersistantStorage
 
 
 class Note(UserDict):
@@ -59,7 +59,8 @@ class NotesManager(PersistantStorage):
 
     def find_notes(self, keyword: str):
         result = list(
-            filter(lambda note: keyword.lower() in note.content.lower(), self.data)
+            filter(lambda note: keyword.lower()
+                   in note.content.lower(), self.data)
         )
         # raise according Error from error_handler.py in case the result is empty
         return result

@@ -2,8 +2,8 @@ from collections import UserDict, defaultdict
 from datetime import datetime
 import calendar
 
-from fields import FieldError, Id, Name
-from persistant_storage import PersistantStorage
+from .fields import FieldError, Id, Name, Phone
+from .storage import PersistantStorage
 
 
 class Record(UserDict):
@@ -59,7 +59,7 @@ class Record(UserDict):
     @phone.setter
     def phone(self, phone: str):
         try:
-            self.data["phone"] = phone  # Phone(phone)
+            self.data["phone"] = Phone(phone)
         except FieldError as e:
             raise e
 
@@ -99,7 +99,8 @@ class Record(UserDict):
 
 class ContactsBook(PersistantStorage):
     def __init__(self):
-        super().__init__("contacts.csv", ["id", "name", "phone", "email", "birthday", "address"], Record)
+        super().__init__("contacts.csv", [
+            "id", "name", "phone", "email", "birthday", "address"], Record)
 
     @PersistantStorage.update
     def add_contact(self, name, phone):
@@ -120,6 +121,15 @@ class ContactsBook(PersistantStorage):
             if datetime.date(record.birthday) <= until_date:
                 records.append(record)
         return records
+
+    def edit_phone(self, id, phone):
+        records = list(filter(lambda record: record["id"] == id, self.data))
+        if not records:
+            return "Contact with Id doesn't exist"
+        if len(records) > 1:
+            return "Error: duplicate id found"
+        records[0].phone = phone
+        return f"Phone update for contact with Id: {id}"
 
 if __name__ == "__main__":
     pass
