@@ -1,6 +1,6 @@
 from collections import UserDict
 
-from fields import FieldError, Id, Name, Phone
+from fields import FieldError, Id, Name, Phone, Email
 from storage import PersistantStorage
 
 
@@ -68,7 +68,7 @@ class Record(UserDict):
     @email.setter
     def email(self, email: str):
         try:
-            self.data["email"] = email  # Email(email)
+            self.data["email"] = Email(email) if email else ""
         except FieldError as e:
             raise e
 
@@ -121,3 +121,16 @@ class ContactsBook(PersistantStorage):
             return "Error: duplicate id found"
         records[0].phone = phone
         return f"Phone update for contact with Id: {id}"
+    
+   def edit_email(self, id: int, new_email: str):
+        if isinstance(id, int) and isinstance(new_email, str):
+            records = list(filter(lambda record: int(record.id.value) == id, self.data))
+            if not records:
+                return "Contact with Id doesn't exist!"
+            if len(records) > 1:
+                return "Error: duplicate id found"
+            records[0].email = new_email
+            return f"Email updated for contact with Id: {id}"
+        else:
+            return "Id should be number and new_email should be string."
+

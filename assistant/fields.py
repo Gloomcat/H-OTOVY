@@ -60,6 +60,16 @@ class Name(_Field):
     def validation_fail_msg(self):
         return "Name should contain only letters."
 
+class Email(_Field):
+    def __init__(self, value):
+        super().__init__(value.lower())
+
+    def validation_func(self, value):
+        return re.match(r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)", value)
+
+    def validation_fail_msg(self):
+        return "Email is invalid. Please follow the format: Any.Name.or.Full.name@sub.domain"
+
 
 class Phone(_Field):
     def validation_func(self, value):
