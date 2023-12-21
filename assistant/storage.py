@@ -12,7 +12,9 @@ class PersistantStorage(UserList):
         self.__dict_file_handle = None
 
     def __open_file(self, modes: str):
-        file_path = Path(__file__).resolve().parent / self.filename
+        data_dir = Path.home().resolve() / ".assistant"
+        data_dir.mkdir(parents=True, exist_ok=True)
+        file_path = data_dir / self.filename
         return open(file_path, modes)
 
     def __enter__(self):
