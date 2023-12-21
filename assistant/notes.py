@@ -70,6 +70,22 @@ class NotesManager(PersistantStorage):
             return "Error: Notebook is empty"
         return self.data
     
+    @PersistantStorage.update
+    def edit_note(self, id, new_content):
+        if 0 <= id < len(self.data):
+            current_note = self.data[id]
+            print(
+                f"Previous version of the note: {current_note.timestamp}: {current_note.content}"
+            )
+
+            # Update the note content
+            current_note.content = new_content
+            print(
+                f"Note edited. New version: {current_note.timestamp}: {current_note.content}"
+            )
+        else:
+            return f"Error: Note with {id} not found"
+
 
 if __name__ == "__main__":
     pass
