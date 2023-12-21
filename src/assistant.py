@@ -32,6 +32,10 @@ class Assistant:
         keyword = " ".join(args)
         result = self.notes.find_notes(keyword)
         return f"Search result: {result}"
+    
+    def show_birthdays(self, args):
+        until_date = args
+        return self.contacts_book.show_birthdays(until_date)
 
     def run(self):
         print(self.WELCOME_MESSAGE)

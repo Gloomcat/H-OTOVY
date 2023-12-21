@@ -21,7 +21,7 @@ def assistant_help():
         },
         "edit-birthday": {
             "args": "<id> <birthday>",
-            "desc": "Updates the birthday for the contact with the specified ID. Use the format YYYY-MM-DD."
+            "desc": "Updates the birthday for the contact with the specified ID. Use the format DD.MM.YYYY."
         },
         "edit-email": {
             "args": "<id> <email>",

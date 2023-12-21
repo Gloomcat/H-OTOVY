@@ -1,5 +1,6 @@
 import re
 from abc import abstractmethod
+from datetime import datetime
 
 
 class FieldError(Exception):
@@ -59,6 +60,13 @@ class Name(_Field):
 
     def validation_fail_msg(self):
         return "Name should contain only letters."
+    
+    
+class Birthday(_Field):
+    def __init__(self, value):
+        if not isinstance(value, datetime):
+            raise TypeError("Birthday must be a date in format DD.MM.YYYY.")
+        super().__init__(value)
 
 
 if __name__ == "__main__":

@@ -1,4 +1,6 @@
-from collections import UserDict
+from collections import UserDict, defaultdict
+from datetime import datetime
+import calendar
 
 from fields import FieldError, Id, Name
 from persistant_storage import PersistantStorage
@@ -112,6 +114,12 @@ class ContactsBook(PersistantStorage):
         self.data.append(record)
         return "Contact added successfully."
 
+    def show_birthdays(self, until_date: datetime.date):
+        records = []
+        for record in self.data:
+            if datetime.date(record.birthday) <= until_date:
+                records.append(record)
+        return records
 
 if __name__ == "__main__":
     pass
