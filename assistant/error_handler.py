@@ -125,9 +125,30 @@ class UpcomingBirthdaysError(Exception):
 
 
 def error_handler(func):
+    """
+    A decorator function used to handle errors raised by the decorated function.
+
+    It captures specific exceptions raised by the decorated function and formats error messages using an instance of OutputFormatter.
+
+    Parameters:
+    func (function): The function to be decorated.
+
+    Returns:
+    function: The inner function that handles exceptions and returns the result of the decorated function.
+    """
     formatter = OutputFormatter()
 
     def inner(*args, **kwargs):
+        """
+        Inner function that executes the decorated function and handles specific exceptions.
+
+        Parameters:
+        *args: Variable length argument list for the decorated function.
+        **kwargs: Arbitrary keyword arguments for the decorated function.
+
+        Returns:
+        Varies: The result of the decorated function or None if an exception is caught.
+        """
         try:
             return func(*args, **kwargs)
         except ContactNotFoundError:
@@ -188,9 +209,30 @@ def error_handler(func):
 
 
 def input_error_handler(func):
+    """
+    A decorator function used to handle errors raised by the decorated function.
+
+    It captures specific exceptions raised by the decorated function and formats error messages using an instance of OutputFormatter.
+
+    Parameters:
+    func (function): The function to be decorated.
+
+    Returns:
+    function: The inner function that handles exceptions and returns the result of the decorated function.
+    """
     formatter = OutputFormatter()
 
     def inner(*args, **kwargs):
+        """
+        Inner function that executes the decorated function and handles specific exceptions.
+
+        Parameters:
+        *args: Variable length argument list for the decorated function.
+        **kwargs: Arbitrary keyword arguments for the decorated function.
+
+        Returns:
+        Varies: The result of the decorated function or None if an exception is caught.
+        """
         try:
             return func(*args, **kwargs)
         except IndexError:
