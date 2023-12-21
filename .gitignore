@@ -5,11 +5,7 @@ __pycache__/
 
 # venv
 pyvenv.cfg
-requirements.txt
 Scripts/
-
-# assistant data dir
-src/data/
 
 # C extensions
 *.so

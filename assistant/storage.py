@@ -12,9 +12,7 @@ class PersistantStorage(UserList):
         self.__dict_file_handle = None
 
     def __open_file(self, modes: str):
-        data_dir = Path(__file__).resolve().parent / "data"
-        data_dir.mkdir(parents=True, exist_ok=True)
-        file_path = data_dir / self.filename
+        file_path = Path(__file__).resolve().parent / self.filename
         return open(file_path, modes)
 
     def __enter__(self):
@@ -22,7 +20,8 @@ class PersistantStorage(UserList):
             self.__dict_file_handle = self.__open_file("r+")
             self.__csv_processor = csv.DictReader(self.__dict_file_handle)
             for row in self.__csv_processor:
-                self.data.append(self.load_type(*(row[field] for field in self.fields)))
+                self.data.append(self.load_type(
+                    *(row[field] for field in self.fields)))
 
         except FileNotFoundError:
             self.__dict_file_handle = self.__open_file("w")
