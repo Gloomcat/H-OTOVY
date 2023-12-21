@@ -121,7 +121,7 @@ class ContactsBook(PersistantStorage):
             if datetime.date(record.birthday) <= until_date:
                 records.append(record)
         return records
-    
+
     def edit_phone(self, id, phone):
         records = list(filter(lambda record: record["id"] == id, self.data))
         if not records:
