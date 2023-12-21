@@ -2,8 +2,8 @@ from collections import UserDict, defaultdict
 from datetime import datetime
 import calendar
 
-from assistant.fields import FieldError, Id, Name, Phone
-from assistant.storage import PersistantStorage
+from fields import FieldError, Id, Name, Phone
+from storage import PersistantStorage
 
 
 class Record(UserDict):
