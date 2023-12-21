@@ -1,6 +1,7 @@
 from .contacts import ContactsBook
 from .notes import NotesManager
 from .help import assistant_help
+from .error_handler import input_error_handler, error_handler
 
 
 class Assistant:
@@ -15,23 +16,28 @@ class Assistant:
         self.contacts = contacts
         self.notes = notes
 
+    @input_error_handler
     def parse_input(self, user_input):
         cmd, *args = user_input.split()
         cmd = cmd.strip().lower()
         return cmd, *args
 
+    @error_handler
     def add_contact(self, args):
         name, phone_number = args
         return self.contacts.add_contact(name, phone_number)
 
+    @error_handler
     def edit_phone(self, args):
         id, phone_number = args
         return self.contacts.edit_phone(id, phone_number)
 
+    @error_handler
     def add_note(self, args):
         content = " ".join(args)
         return self.notes.add_note(content)
 
+    @error_handler
     def find_notes(self, args):
         keyword = " ".join(args)
         result = self.notes.find_notes(keyword)
