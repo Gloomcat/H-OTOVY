@@ -86,6 +86,13 @@ class NotesManager(PersistantStorage):
         else:
             return f"Error: Note with {id} not found"
 
+    def delete_note(self, id):
+        if 0 <= id < len(self.data):
+            self.data.pop(id)
+            return f"Note with Id {id} deleted successfully."
+        else:
+            return "Note not found."
+    
 
 if __name__ == "__main__":
     pass

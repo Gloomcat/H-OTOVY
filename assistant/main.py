@@ -53,6 +53,10 @@ class Assistant:
     def edit_note(self, args):
         id, new_content = int(args[0]), " ".join(args[1:])
         return self.notes.edit_note(id, new_content)
+    
+    @error_handler
+    def delete_note(self, args):
+        return self.notes.delete_note(args[0])
 
 
 def run():
@@ -83,6 +87,8 @@ def run():
                 formatter.print_table(assistant.show_notes())
             elif command == "edit-note":
                 formatter.print_info(assistant.edit_note(args))
+            elif command == "delete-note":
+                formatter.print_table(assistant.delete_note(args))
             else:
                 formatter.print_error("Please, provide a correct command.")
 
