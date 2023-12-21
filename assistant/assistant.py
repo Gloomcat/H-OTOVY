@@ -24,6 +24,10 @@ class Assistant:
         name, phone_number = args
         return self.contacts.add_contact(name, phone_number)
 
+    def edit_phone(self, args):
+        id, phone_number = args
+        return self.contacts.edit_phone(id, phone_number)
+
     def add_note(self, args):
         content = " ".join(args)
         return self.notes.add_note(content)
@@ -52,6 +56,8 @@ def run():
                 print(assistant.add_contact(args))
             elif command == "add-note":
                 print(assistant.add_note(args))
+            elif command == "edit-phone":
+                print(assistant.edit_phone(args))
             elif command == "find-notes":
                 print(assistant.find_notes(args))
             else:

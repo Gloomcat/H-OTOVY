@@ -1,6 +1,6 @@
 from collections import UserDict
 
-from .fields import FieldError, Id, Name
+from .fields import FieldError, Id, Name, Phone
 from .storage import PersistantStorage
 
 
@@ -57,7 +57,7 @@ class Record(UserDict):
     @phone.setter
     def phone(self, phone: str):
         try:
-            self.data["phone"] = phone  # Phone(phone)
+            self.data["phone"] = Phone(phone)
         except FieldError as e:
             raise e
 
@@ -112,6 +112,15 @@ class ContactsBook(PersistantStorage):
         record = Record(id, name, phone)
         self.data.append(record)
         return "Contact added successfully."
+
+    def edit_phone(self, id, phone):
+        records = list(filter(lambda record: record["id"] == id, self.data))
+        if not records:
+            return "Contact with Id doesn't exist"
+        if len(records) > 1:
+            return "Error: duplicate id found"
+        records[0].phone = phone
+        return f"Phone update for contact with Id: {id}"
 
 
 if __name__ == "__main__":

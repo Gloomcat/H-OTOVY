@@ -61,5 +61,13 @@ class Name(_Field):
         return "Name should contain only letters."
 
 
+class Phone(_Field): 
+    def validation_func(self, value):
+        return re.match(r'\+\d{12}$', value)
+    
+    def validation_fail_msg(self):
+        return "Phone number is invalid. Phone should start with '+' sign and contain 12 digits"
+
+
 if __name__ == "__main__":
     pass
