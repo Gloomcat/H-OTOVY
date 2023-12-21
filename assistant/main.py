@@ -44,6 +44,10 @@ class Assistant:
         keyword = " ".join(args)
         result = self.notes.find_notes(keyword)
         return result
+    
+    @error_handler
+    def show_notes(self):
+        return self.notes.show_notes()
 
 
 def run():
@@ -70,6 +74,8 @@ def run():
                 formatter.print_info(assistant.edit_phone(args))
             elif command == "find-notes":
                 formatter.print_table(assistant.find_notes(args))
+            elif command == "show-notes":
+                formatter.print_table(assistant.show_notes())
             else:
                 formatter.print_error("Please, provide a correct command.")
 
