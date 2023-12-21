@@ -62,6 +62,18 @@ class Assistant:
         str: A message indicating the success or failure of the operation.
         """
         name, phone_number = args
+        answer = input("Would you like to add more info about the contact (Y/n)?:")
+        if answer == "Y":
+            birthday = input("Birthday:")
+            email = input("Email:")
+            zipp_code = input("Zipp code:")
+            country = input("Country:")
+            city = input("City:")
+            street = input("Street:")
+            building_number = input("Building number:")
+            appartment = input("Appartment:")
+            address = f"{zipp_code}, {country}, {city}, {street}, {building_number}, {appartment}"
+            return self.contacts.add_contact(name, phone_number, email, address, birthday)
         return self.contacts.add_contact(name, phone_number)
 
     @error_handler

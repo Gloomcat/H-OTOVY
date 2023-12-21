@@ -190,7 +190,10 @@ class Record(UserDict):
         except FieldError as e:
             raise e
 
-
+    def __repr__(self):
+         return f"{self.id} {self.name} {self.phone} {self.email} {self.address} {self.birthday}"
+    
+    
 class ContactsBook(PersistantStorage):
     """
     A class representing a contacts book, storing and managing a collection of contacts.
@@ -209,7 +212,7 @@ class ContactsBook(PersistantStorage):
             "id", "name", "phone", "email", "birthday", "address"], Record)
 
     @PersistantStorage.update
-    def add_contact(self, name, phone):
+    def add_contact(self, name, phone, email="", address="", birthday=""):
         """
         Adds a new contact to the contacts book.
 
@@ -227,7 +230,10 @@ class ContactsBook(PersistantStorage):
             # raise according Error from error_handler.py in case the name already exists
             return "Contact with the name already exists."
         id = len(self.data)
-        record = Record(id, name, phone)
+        if email and address and birthday:
+            record = Record(id, name, phone, email, birthday, address)
+        else:
+            record = Record(id, name, phone)
         self.data.append(record)
         return "Contact added successfully."
 
@@ -250,7 +256,7 @@ class ContactsBook(PersistantStorage):
         records[0].phone = phone
         return f"Phone update for contact with Id: {id}"
     
-   def edit_email(self, id: int, new_email: str):
+    def edit_email(self, id: int, new_email: str):
         if isinstance(id, int) and isinstance(new_email, str):
             records = list(filter(lambda record: int(record.id.value) == id, self.data))
             if not records:
