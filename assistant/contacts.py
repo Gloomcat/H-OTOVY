@@ -1,7 +1,7 @@
 from collections import UserDict
 
-from fields import FieldError, Id, Name
-from persistant_storage import PersistantStorage
+from .fields import FieldError, Id, Name
+from .storage import PersistantStorage
 
 
 class Record(UserDict):
@@ -97,7 +97,8 @@ class Record(UserDict):
 
 class ContactsBook(PersistantStorage):
     def __init__(self):
-        super().__init__("contacts.csv", ["id", "name", "phone", "email", "birthday", "address"], Record)
+        super().__init__("contacts.csv", [
+            "id", "name", "phone", "email", "birthday", "address"], Record)
 
     @PersistantStorage.update
     def add_contact(self, name, phone):

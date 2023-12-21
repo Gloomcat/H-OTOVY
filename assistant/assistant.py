@@ -1,11 +1,11 @@
-from contacts_book import ContactsBook
-from notes_manager import NotesManager
-from assistant_help import assistant_help
+from .contacts import ContactsBook
+from .notes import NotesManager
+from .help import assistant_help
 
 
 class Assistant:
     WELCOME_MESSAGE = (
-        "Welcome to the Console Assistant!\n"
+        "Welcome to the Assistant!\n"
         "I am ready to help you manage your contacts and notes.\n"
         "Type 'help' to see a list of available commands, 'exit' or 'close' to finish the session.\n"
         "How can I assist you today?"
@@ -15,7 +15,7 @@ class Assistant:
         self.contacts = contacts
         self.notes = notes
 
-    def _parse_input(self, user_input):
+    def parse_input(self, user_input):
         cmd, *args = user_input.split()
         cmd = cmd.strip().lower()
         return cmd, *args
@@ -33,12 +33,14 @@ class Assistant:
         result = self.notes.find_notes(keyword)
         return f"Search result: {result}"
 
-    def run(self):
-        print(self.WELCOME_MESSAGE)
 
+def run():
+    print(Assistant.WELCOME_MESSAGE)
+    with ContactsBook() as contacts, NotesManager() as notes:
+        assistant = Assistant(contacts, notes)
         while True:
             user_input = input("Enter a command, please: ")
-            command, *args = self._parse_input(user_input)
+            command, *args = assistant.parse_input(user_input)
 
             if command in ["exit", "close"]:
                 print("Goodbye, have a nice day!")
@@ -47,14 +49,14 @@ class Assistant:
             elif command == "help":
                 assistant_help()
             elif command == "add-contact":
-                print(self.add_contact(args))
+                print(assistant.add_contact(args))
             elif command == "add-note":
-                print(self.add_note(args))
+                print(assistant.add_note(args))
             elif command == "find-notes":
-                print(self.find_notes(args))
+                print(assistant.find_notes(args))
             else:
                 print("Please, provide a correct command.")
 
 
 if __name__ == "__main__":
-    pass
+    run()
