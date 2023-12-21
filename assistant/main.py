@@ -51,8 +51,10 @@ def run():
     auto_completer = AutoCompleter(get_command_list())
     formatter = OutputFormatter()
     formatter.print_greeting(Assistant.WELCOME_MESSAGE)
+
     with ContactsBook() as contacts, NotesManager() as notes:
         assistant = Assistant(contacts, notes)
+
         while True:
             formatter.print_input("Enter a command, please: ")
             user_input = auto_completer.get_user_input()
@@ -61,7 +63,6 @@ def run():
             if command in ["exit", "close"]:
                 formatter.print_greeting(Assistant.FAREWELL_MESSAGE)
                 break
-            # elif: add other commands and according functions
             elif command == "help":
                 formatter.print_table(assistant_help())
             elif command == "add-contact":
