@@ -63,7 +63,43 @@ class Assistant:
         str: A message indicating the success or failure of the operation.
         """
         name, phone_number = args
+        answer = input("Would you like to add more info about the contact (Y/n)?:")
+        if answer == "Y":
+            birthday = input("Birthday:")
+            email = input("Email:")
+            zipp_code = input("Zipp code:")
+            country = input("Country:")
+            city = input("City:")
+            street = input("Street:")
+            building_number = input("Building number:")
+            appartment = input("Appartment:")
+            address = f"{zipp_code}, {country}, {city}, {street}, {building_number}, {appartment}"
+            return self.contacts.add_contact(name, phone_number, email, address, birthday)
         return self.contacts.add_contact(name, phone_number)
+
+    @error_handler
+    def delete_contact(self, args):
+        """
+        Deletes a contact based on the provided ID.
+
+        Parameters:
+        args (list): A list containing the ID of the contact to be deleted.
+
+        Returns:
+        str: A message indicating the success or failure of the deletion operation.
+        """
+        id = args[0]
+        return self.contacts.delete_contact(id)
+
+    @error_handler
+    def show_contacts(self):
+        """
+        Retrieves and displays the list of contacts.
+
+        Returns:
+        str: A message indicating the success or failure of the operation.
+        """
+        return self.contacts.show_contacts()
 
     @error_handler
     def edit_phone(self, args):
@@ -77,7 +113,7 @@ class Assistant:
         str: A message indicating the success or failure of the operation.
         """
         id, phone_number = args
-        return self.contacts.edit_phone(id, phone_number)
+        return self.contacts.edit_phone(int(id), phone_number)
 
     @error_handler
     def edit_email(self, args):
@@ -110,8 +146,7 @@ class Assistant:
         list: A list of notes that match the keyword.
         """
         keyword = " ".join(args)
-        result = self.notes.find_notes(keyword)
-        return result
+        return self.notes.find_notes(keyword)
 
     @error_handler
     def show_notes(self):
@@ -119,12 +154,31 @@ class Assistant:
 
     @error_handler
     def edit_note(self, args):
-        id, new_content = int(args[0]), " ".join(args[1:])
+        id, new_content = args[0], " ".join(args[1:])
         return self.notes.edit_note(id, new_content)
 
     @error_handler
     def delete_note(self, args):
         return self.notes.delete_note(args[0])
+
+    @error_handler
+    def add_note_tag(self, args):
+        id, tag = args
+        return self.notes.add_note_tag(id, tag)
+
+    @error_handler
+    def delete_note_tag(self, args):
+        id, tag = args
+        return self.notes.delete_note_tag(id, tag)
+
+    @error_handler
+    def edit_note_tag(self, args):
+        id, tag, new_tag = args
+        return self.notes.edit_note_tag(id, tag, new_tag)
+
+    @error_handler
+    def find_notes_by_tag(self, args):
+        return self.notes.find_notes_by_tag(args[0])
 
 
 def run():
@@ -152,6 +206,10 @@ def run():
                 formatter.print_table(assistant_help())
             elif command == "add-contact":
                 formatter.print_info(assistant.add_contact(args))
+            elif command == "delete-contact":
+                formatter.print_info(assistant.delete_contact(args))
+            elif command == "show-contacts":
+                formatter.print_table(assistant.show_contacts())
             elif command == "add-note":
                 formatter.print_info(assistant.add_note(args))
             elif command == "edit-phone":
@@ -165,7 +223,15 @@ def run():
             elif command == "edit-note":
                 formatter.print_info(assistant.edit_note(args))
             elif command == "delete-note":
-                formatter.print_table(assistant.delete_note(args))
+                formatter.print_info(assistant.delete_note(args))
+            elif command == "add-note-tag":
+                formatter.print_info(assistant.add_note_tag(args))
+            elif command == "delete-note-tag":
+                formatter.print_info(assistant.delete_note_tag(args))
+            elif command == "edit-note-tag":
+                formatter.print_info(assistant.edit_note_tag(args))
+            elif command == "find-notes-by-tag":
+                formatter.print_table(assistant.find_notes_by_tag(args))
             else:
                 formatter.print_error("Please, provide a correct command.")
 

@@ -190,7 +190,10 @@ class Record(UserDict):
         except FieldError as e:
             raise e
 
-
+    def __repr__(self):
+         return f"{self.id} {self.name} {self.phone} {self.email} {self.address} {self.birthday}"
+    
+    
 class ContactsBook(PersistantStorage):
     """
     A class representing a contacts book, storing and managing a collection of contacts.
@@ -209,7 +212,7 @@ class ContactsBook(PersistantStorage):
             "id", "name", "phone", "email", "birthday", "address"], Record)
 
     @PersistantStorage.update
-    def add_contact(self, name, phone):
+    def add_contact(self, name, phone, email="", address="", birthday=""):
         """
         Adds a new contact to the contacts book.
 
@@ -227,10 +230,40 @@ class ContactsBook(PersistantStorage):
             # raise according Error from error_handler.py in case the name already exists
             return "Contact with the name already exists."
         id = len(self.data)
-        record = Record(id, name, phone)
+        if email and address and birthday:
+            record = Record(id, name, phone, email, birthday, address)
+        else:
+            record = Record(id, name, phone)
         self.data.append(record)
         return "Contact added successfully."
+    
+    @PersistantStorage.update
+    def delete_contact(self, id):
+        """
+        Deletes a contact based on the provided ID.
 
+        Parameters:
+        id (int): The ID of the contact to be deleted.
+
+        Returns:
+        str: A message indicating the success or failure of the deletion operation.
+        """
+        records = list(filter(lambda record: record["id"] == id, self.data))
+        if not records:
+            return "Contact with Id doesn't exist!"
+        self.data.remove(records[0])
+        return "Contact was deleted."
+
+    def show_contacts(self):
+        """
+        Retrieves and returns the list of contacts.
+
+        Returns:
+        list: A list containing the contacts.
+        """
+        return self.data
+
+    @PersistantStorage.update
     def edit_phone(self, id, phone):
         """
         Edits the phone number of an existing contact in the contacts book.
@@ -250,7 +283,7 @@ class ContactsBook(PersistantStorage):
         records[0].phone = phone
         return f"Phone update for contact with Id: {id}"
     
-   def edit_email(self, id: int, new_email: str):
+    def edit_email(self, id: int, new_email: str):
         if isinstance(id, int) and isinstance(new_email, str):
             records = list(filter(lambda record: int(record.id.value) == id, self.data))
             if not records:
