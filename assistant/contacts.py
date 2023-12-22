@@ -567,7 +567,7 @@ class ContactsBook(PersistantStorage):
         number_of_days = int(number_of_days)
 
         for record in self.data:
-            if record.birthday:
+            if str(record.birthday):
                 birth_date = datetime.strptime(
                     str(record.birthday), "%d.%m.%Y"
                 ).replace(year=today.year)
@@ -592,4 +592,5 @@ class ContactsBook(PersistantStorage):
             {"date": date, "names": ", ".join(names)}
             for date, names in birthdays_dict.items()
         ]
+        self._check_empty_result(formatted_birthdays)
         return formatted_birthdays
