@@ -53,6 +53,12 @@ class InvalidBirthdayDaysParameter(_AssistantError):
     pass
 
 
+class EmptyNoteError(_AssistantError):
+    """Raised for empty note contents list."""
+
+    pass
+
+
 class EmptyNotesError(_AssistantError):
     """Raised for empty notes list."""
 
@@ -112,9 +118,10 @@ def error_handler(func):
             return func(*args, **kwargs)
         except _AssistantError as e:
             formatter.print_error(e)
+        except (IndexError, ValueError):
+            formatter.print_error("Error: Insufficient arguments for command provided. Type 'help' to see valid arguments for the command.")
         except Exception as e:
             formatter.print_error(f"An unexpected error occurred: {e}")
-            raise e
 
     return inner
 
@@ -149,9 +156,8 @@ def input_error_handler(func):
         except IndexError:
             formatter.print_error("No command provided. Please enter a command.")
         except ValueError as e:
-            formatter.print_error(f"Error in command: {e}")
+            formatter.print_error("Error: No command provided. Type 'help' to see list of possible commands.")
         except Exception as e:
             formatter.print_error(f"An unexpected input error occurred: {e}")
-            raise e
 
     return inner
