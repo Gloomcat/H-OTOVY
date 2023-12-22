@@ -77,6 +77,20 @@ class Assistant:
             address = f"{zipp_code}, {country}, {city}, {street}, {building_number}, {appartment}"
             return self.contacts.add_contact(name, phone_number, email, address, birthday)
         return self.contacts.add_contact(name, phone_number)
+    
+    def find_contacts(self, args):
+        """
+        Finds and retrieves contacts based on the provided criteria and value.
+
+        Parameters:
+        args (list): A list containing the criteria and value to search for. 
+                    The first element is the criteria (e.g., "id", "name"), and the second element is the value to search for.
+
+        Returns:
+        list: A list containing the contacts that match the specified criteria and value.
+        """
+        criteria, value = args
+        return self.contacts.find_contacts(criteria, value)
 
     @error_handler
     def delete_contact(self, args):
@@ -211,6 +225,8 @@ def run():
                 formatter.print_info(assistant.delete_contact(args))
             elif command == "show-contacts":
                 formatter.print_table(assistant.show_contacts())
+            elif command == "find-contacts":
+                formatter.print_table(assistant.find_contacts(args))
             elif command == "add-note":
                 formatter.print_info(assistant.add_note(args))
             elif command == "edit-phone":

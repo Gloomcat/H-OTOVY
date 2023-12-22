@@ -40,8 +40,8 @@ def assistant_help():
         },
         {
             "command": "find-contacts",
-            "arguments": "<some-value>",
-            "description": "Searches for contacts that match the given value in any of their details."
+            "arguments": "<criteria> <some-value>"
+            "description": "Finds and retrieves contacts based on the provided criteria and value. Criteria acceptable values: 'id', 'name', 'phone', 'email', 'birthday', 'address'."
         },
         {
             "command": "show-contacts",
