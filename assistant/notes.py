@@ -10,7 +10,7 @@ from error_handler import (
     TagIsPresentError,
     TagIsAbsentError,
     FieldValidationError,
-    EmptyNoteError
+    EmptyNoteError,
 )
 
 
