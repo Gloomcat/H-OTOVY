@@ -1,126 +1,97 @@
 from output_formater import OutputFormatter
 
 
-class ContactNotFoundError(Exception):
+class _AssistantError(Exception):
+    """Common base class for Assistant project errors"""
+    pass
+
+
+class ContactNotFoundError(_AssistantError):
     """Raised when a contact is not found."""
     pass
 
 
-class InvalidFormatError(Exception):
+class InvalidFormatError(_AssistantError):
     """Raised for general invalid format errors."""
     pass
 
 
-class InvalidCommandArgumentError(Exception):
+class InvalidCommandArgumentError(_AssistantError):
     """Raised for invalid command argument errors."""
     pass
 
 
-class PhoneIsExistError(Exception):
+class PhoneIsExistError(_AssistantError):
     """Raised when a phone number already exists."""
     pass
 
 
-class InputOutputError(Exception):
+class InputOutputError(_AssistantError):
     """Raised for input/output errors."""
     pass
 
 
-class IncorrectInputError(Exception):
+class IncorrectInputError(_AssistantError):
     """Raised for general incorrect input."""
     pass
 
 
 # Add contacts
-class InsufficientContactArgumentsError(Exception):
+class InsufficientContactArgumentsError(_AssistantError):
     """Raised for insufficient arguments in adding contact."""
     pass
 
 
-class ContactExistsError(Exception):
+class ContactExistsError(_AssistantError):
     """Raised when a contact already exists."""
     pass
 
 
 # Edit contact
-class InsufficientEditContactArgumentsError(Exception):
+class InsufficientEditContactArgumentsError(_AssistantError):
     """Raised for insufficient arguments in editing contact."""
     pass
 
 
-class InvalidContactIDError(Exception):
-    """Raised for invalid contact ID."""
-    pass
-
-
 # Delete contact
-class InsufficientDeleteContactArgumentsError(Exception):
+class InsufficientDeleteContactArgumentsError(_AssistantError):
     """Raised for insufficient arguments in deleting contact."""
     pass
 
 
-# Notes (Add, Edit, Delete)
-class InsufficientNoteArgumentsError(Exception):
-    """Raised for insufficient arguments in note operations."""
-    pass
-
-
-class InvalidNoteIDError(Exception):
-    """Raised for invalid note ID."""
-    pass
-
-
-# Search (Contacts and Notes)
-class InsufficientSearchCriteriaError(Exception):
-    """Raised for insufficient search criteria."""
-    pass
-
-
-class InvalidSearchCriteriaError(Exception):
-    """Raised for invalid search criteria."""
-    pass
-
-
-# Add tags
-class InsufficientTagArgumentsError(Exception):
-    """Exception raised for errors due to insufficient arguments for adding tags."""
-    pass
-
-
-class InvalidNoteOrContactIDError(Exception):
-    """Exception raised for errors due to an invalid note or contact ID for tagging."""
-    pass
-
-
-class TagAdditionError(Exception):
-    """Exception raised for general errors during tag addition."""
-    pass
-
-
-# Search notes by tags
-class InsufficientTagSearchArgumentsError(Exception):
-    """Exception raised for errors due to insufficient tag search arguments."""
-    pass
-
-
-class InvalidTagError(Exception):
-    """Exception raised for errors due to invalid tags for search."""
-    pass
-
-
-class TagSearchError(Exception):
-    """Exception raised for general errors during searching by tags."""
-    pass
-
-
 # Upcoming birthdays
-class InvalidDaysFormatError(Exception):
+class InvalidDaysFormatError(_AssistantError):
     """Exception raised for errors due to invalid days format for upcoming birthdays."""
     pass
 
 
-class UpcomingBirthdaysError(Exception):
+class UpcomingBirthdaysError(_AssistantError):
     """Exception raised for general errors during calculation of upcoming birthdays."""
+    pass
+
+
+class EmptyNotesError(_AssistantError):
+    """Raised for empty notes list."""
+    pass
+
+
+class InvalidNoteOrContactIDError(_AssistantError):
+    """Raised for invalid note or contact ID."""
+    pass
+
+
+class NoResultsFoundError(_AssistantError):
+    """Exception raised for errors due to search process fail."""
+    pass
+
+
+class TagIsAbsentError(_AssistantError):
+    """Raised for tag absense if it must be present."""
+    pass
+
+
+class TagIsPresentError(_AssistantError):
+    """Raised for tag presense if it must be absent."""
     pass
 
 
@@ -171,37 +142,15 @@ def error_handler(func):
         except InsufficientEditContactArgumentsError:
             formatter.print_error(
                 "Error: Insufficient arguments in editing contact. Please provide all required information.")
-        except InvalidContactIDError:
-            formatter.print_error("Error: Invalid contact ID. Please provide a valid contact ID.")
         except InsufficientDeleteContactArgumentsError:
             formatter.print_error(
                 "Error: Insufficient arguments in deleting contact. Please provide all required information.")
-        except InsufficientNoteArgumentsError:
-            formatter.print_error(
-                "Error: Insufficient arguments in note operations. Please provide all required information.")
-        except InvalidNoteIDError:
-            formatter.print_error("Error: Invalid note ID. Please provide a valid note ID.")
-        except InsufficientSearchCriteriaError:
-            formatter.print_error("Error: Insufficient search criteria. Please provide more criteria.")
-        except InvalidSearchCriteriaError:
-            formatter.print_error("Error: Invalid search criteria. Please use valid search criteria.")
-        except InsufficientTagArgumentsError:
-            formatter.print_error(
-                "Error: Insufficient arguments for adding tags. Please provide all required information.")
-        except InvalidNoteOrContactIDError:
-            formatter.print_error("Error: Invalid note or contact ID for tagging. Please use valid IDs.")
-        except TagAdditionError:
-            formatter.print_error("Error: Error during tag addition. Please try again.")
-        except InsufficientTagSearchArgumentsError:
-            formatter.print_error("Error: Insufficient tag search arguments. Please provide more criteria.")
-        except InvalidTagError:
-            formatter.print_error("Error: Invalid tags for search. Please use valid tags.")
-        except TagSearchError:
-            formatter.print_error("Error: Error during tag search. Please try again.")
         except InvalidDaysFormatError:
             formatter.print_error("Error: Invalid days format for upcoming birthdays. Please provide a valid format.")
         except UpcomingBirthdaysError:
             formatter.print_error("Error: Error during calculation of upcoming birthdays. Please try again.")
+        except (InvalidNoteOrContactIDError, EmptyNotesError, NoResultsFoundError, TagIsPresentError, TagIsAbsentError) as e:
+            formatter.print_error(e)
         except Exception as e:
             formatter.print_error(f"An unexpected error occurred: {e}")
             raise e
@@ -241,7 +190,7 @@ def input_error_handler(func):
         except ValueError as e:
             formatter.print_error(f"Error in command: {e}")
         except Exception as e:
-            formatter.print_error(f"An unexpected error occurred: {e}")
+            formatter.print_error(f"An unexpected input error occurred: {e}")
             raise e
 
     return inner

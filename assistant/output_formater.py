@@ -36,7 +36,7 @@ class OutputFormatter:
         text (str): The text to be printed as a greeting message.
         """
         if isinstance(text, str):
-            self.console.print(f"[bold blue]{text}[/bold blue]")
+            self.console.print(f"[bold cyan]{text}[/bold cyan]")
 
     def print_info(self, text):
         """
@@ -55,7 +55,7 @@ class OutputFormatter:
         Parameters:
         error (str): The text to be printed as an error message.
         """
-        if isinstance(error, str):
+        if isinstance(error, (str, Exception)):
             self.console.print(f"[bold red]{error}[/bold red]")
 
     def print_table(self, data):
@@ -66,8 +66,8 @@ class OutputFormatter:
         data (list): A list of dictionaries, where each dictionary represents a row in the table.
         """
         if isinstance(data, list):
-            column_colors = ["cyan", "magenta", "yellow"]
-            header_color = "bold magenta"
+            column_colors = ["cyan" for _ in range(len(data[0].keys()))]
+            header_color = "bold green"
 
             table = Table(show_header=True, header_style=header_color)
 
@@ -77,6 +77,6 @@ class OutputFormatter:
                 table.add_column(header.capitalize(), style=color)
 
             for item in data:
-                table.add_row(*[item.get(header, "") for header in headers])
+                table.add_row(*[str(item.get(header, "")) for header in headers])
 
             self.console.print(table)

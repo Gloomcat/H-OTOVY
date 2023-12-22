@@ -90,6 +90,15 @@ class Id(_Field):
     A field representing an Id, extending _Field.
     """
 
+    def __init__(self, value):
+        """
+        Initializes a new Id instance with the provided value.
+
+        Parameters:
+        value (str, int): The initial Id value, which will be converted to 'int' if needed.
+        """
+        super().__init__(int(value) if isinstance(value, str) else value)
+
     def validation_func(self, value):
         """
         Validates whether the value is an integer.
@@ -208,4 +217,3 @@ class Phone(_Field):
         str: A message indicating the format for a valid phone number.
         """
         return "Phone number is invalid. Phone should start with '+' sign and contain 12 digits."
-

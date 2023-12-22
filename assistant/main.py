@@ -1,9 +1,10 @@
 from contacts import ContactsBook
 from notes import NotesManager
-from help import assistant_help
+from help import assistant_help, get_command_list
 from error_handler import input_error_handler, error_handler
 from datetime import datetime
 from output_formater import OutputFormatter
+from autocomplete import AutoCompleter
 
 
 class Assistant:
@@ -78,6 +79,30 @@ class Assistant:
         return self.contacts.add_contact(name, phone_number)
 
     @error_handler
+    def delete_contact(self, args):
+        """
+        Deletes a contact based on the provided ID.
+
+        Parameters:
+        args (list): A list containing the ID of the contact to be deleted.
+
+        Returns:
+        str: A message indicating the success or failure of the deletion operation.
+        """
+        id = args[0]
+        return self.contacts.delete_contact(id)
+
+    @error_handler
+    def show_contacts(self):
+        """
+        Retrieves and displays the list of contacts.
+
+        Returns:
+        str: A message indicating the success or failure of the operation.
+        """
+        return self.contacts.show_contacts()
+
+    @error_handler
     def edit_phone(self, args):
         """
         Edits the phone number of an existing contact.
@@ -89,8 +114,8 @@ class Assistant:
         str: A message indicating the success or failure of the operation.
         """
         id, phone_number = args
-        return self.contacts.edit_phone(id, phone_number)
-    
+        return self.contacts.edit_phone(int(id), phone_number)
+
     @error_handler
     def edit_email(self, args):
         id, email = args
@@ -122,31 +147,39 @@ class Assistant:
         list: A list of notes that match the keyword.
         """
         keyword = " ".join(args)
-        result = self.notes.find_notes(keyword)
-        return f"Search result: {result}"
-    
-    @error_handler
-    def edit_birthday(self, args):
-        id, birthday = args
-        return self.contacts.edit_birthday(id, birthday)
+        return self.notes.find_notes(keyword)
 
-    @error_handler
-    def show_birthdays(self, args):
-        number_of_days = args[0]
-        return self.contacts.show_birthdays(number_of_days)
-    
     @error_handler
     def show_notes(self):
         return self.notes.show_notes()
-    
+
     @error_handler
     def edit_note(self, args):
-        id, new_content = int(args[0]), " ".join(args[1:])
+        id, new_content = args[0], " ".join(args[1:])
         return self.notes.edit_note(id, new_content)
-    
+
     @error_handler
     def delete_note(self, args):
         return self.notes.delete_note(args[0])
+
+    @error_handler
+    def add_note_tag(self, args):
+        id, tag = args
+        return self.notes.add_note_tag(id, tag)
+
+    @error_handler
+    def delete_note_tag(self, args):
+        id, tag = args
+        return self.notes.delete_note_tag(id, tag)
+
+    @error_handler
+    def edit_note_tag(self, args):
+        id, tag, new_tag = args
+        return self.notes.edit_note_tag(id, tag, new_tag)
+
+    @error_handler
+    def find_notes_by_tag(self, args):
+        return self.notes.find_notes_by_tag(args[0])
 
 
 def run():
@@ -155,13 +188,16 @@ def run():
 
     This function initializes the Assistant and handles the main loop for user interaction. It processes user commands and displays responses or errors.
     """
+    auto_completer = AutoCompleter(get_command_list())
     formatter = OutputFormatter()
     formatter.print_greeting(Assistant.WELCOME_MESSAGE)
+
     with ContactsBook() as contacts, NotesManager() as notes:
         assistant = Assistant(contacts, notes)
+
         while True:
             formatter.print_input("Enter a command, please: ")
-            user_input = input()
+            user_input = auto_completer.get_user_input()
             command, *args = assistant.parse_input(user_input)
 
             if command in ["exit", "close"]:
@@ -171,6 +207,10 @@ def run():
                 formatter.print_table(assistant_help())
             elif command == "add-contact":
                 formatter.print_info(assistant.add_contact(args))
+            elif command == "delete-contact":
+                formatter.print_info(assistant.delete_contact(args))
+            elif command == "show-contacts":
+                formatter.print_table(assistant.show_contacts())
             elif command == "add-note":
                 formatter.print_info(assistant.add_note(args))
             elif command == "edit-phone":
@@ -188,7 +228,15 @@ def run():
             elif command == "edit-note":
                 formatter.print_info(assistant.edit_note(args))
             elif command == "delete-note":
-                formatter.print_table(assistant.delete_note(args))
+                formatter.print_info(assistant.delete_note(args))
+            elif command == "add-note-tag":
+                formatter.print_info(assistant.add_note_tag(args))
+            elif command == "delete-note-tag":
+                formatter.print_info(assistant.delete_note_tag(args))
+            elif command == "edit-note-tag":
+                formatter.print_info(assistant.edit_note_tag(args))
+            elif command == "find-notes-by-tag":
+                formatter.print_table(assistant.find_notes_by_tag(args))
             else:
                 formatter.print_error("Please, provide a correct command.")
 

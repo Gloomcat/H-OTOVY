@@ -237,8 +237,35 @@ class ContactsBook(PersistantStorage):
         else:
             record = Record(id, name, phone)
         self.data.append(record)
-        return f"Contact added successfully with Id: {id}."
+        return "Contact added successfully."
+    
+    @PersistantStorage.update
+    def delete_contact(self, id):
+        """
+        Deletes a contact based on the provided ID.
 
+        Parameters:
+        id (int): The ID of the contact to be deleted.
+
+        Returns:
+        str: A message indicating the success or failure of the deletion operation.
+        """
+        records = list(filter(lambda record: record["id"] == id, self.data))
+        if not records:
+            return "Contact with Id doesn't exist!"
+        self.data.remove(records[0])
+        return "Contact was deleted."
+
+    def show_contacts(self):
+        """
+        Retrieves and returns the list of contacts.
+
+        Returns:
+        list: A list containing the contacts.
+        """
+        return self.data
+
+    @PersistantStorage.update
     def edit_phone(self, id, phone):
         id = Id(id)
         """

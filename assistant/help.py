@@ -77,5 +77,31 @@ def assistant_help():
             "command": "show-notes",
             "arguments": "<id>",
             "description": "Displays the content of the note with the specified ID."
+        },
+        {
+            "command": "add-note-tag",
+            "arguments": "<id> <tag>",
+            "description": "Add tag to the note with the specified ID."
+        },
+        {
+            "command": "delete-note-tag",
+            "arguments": "<id> <tag>",
+            "description": "Delete tag from the note with the specified ID."
+        },
+        {
+            "command": "edit-note-tag",
+            "arguments": "<id> <tag> <new-tag>",
+            "description": "Replace tag by new one in the note with the specified ID."
+        },
+        {
+            "command": "find-notes-by-tag",
+            "arguments": "<tag>",
+            "description": "Find notes by the Tag specified."
         }
     ]
+
+def get_command_list():
+    commands = [command["command"] for command in assistant_help()]
+    additional_commands = ['close', 'exit', 'help']
+    commands.extend(additional_commands)
+    return commands
