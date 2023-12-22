@@ -2,7 +2,6 @@ from contacts import ContactsBook
 from notes import NotesManager
 from help import assistant_help, get_command_list
 from error_handler import input_error_handler, error_handler
-from datetime import datetime
 from output_formater import OutputFormatter
 from autocomplete import AutoCompleter
 
@@ -16,6 +15,7 @@ class Assistant:
         FAREWELL_MESSAGE (str): A constant string containing the farewell message.
         contacts (ContactsBook): An instance of ContactsBook for managing contact data.
         notes (NotesManager): An instance of NotesManager for managing note data.
+        formatter (OutputFormatter): An instance of OutputFormatter for managing prompts and output messages
     """
 
     WELCOME_MESSAGE = (
@@ -36,6 +36,41 @@ class Assistant:
         """
         self.contacts = contacts
         self.notes = notes
+        self.formatter = OutputFormatter()
+
+    @error_handler
+    def _get_value_request(self, prompt):
+        """
+        Get user input for a specific value based on the provided prompt.
+
+        Parameters:
+        - prompt (str): The prompt indicating the type of value to be entered.
+
+        Returns:
+        str: The user-entered value.
+        """
+        self.formatter.print_input(f"Enter a {prompt}: ")
+        return input()
+
+    @error_handler
+    def _get_address_request(self):
+        """
+        Get user input for an address by prompting for ZIP code, country, city, and street.
+
+        Returns:
+        str: The formatted address string.
+        """
+        return ", ".join(
+            (
+                self._get_value_request(prompt)
+                for prompt in (
+                    "ZIP code",
+                    "country",
+                    "city",
+                    "street (optional: building number, appartment)",
+                )
+            )
+        )
 
     @input_error_handler
     def parse_input(self, user_input):
@@ -64,26 +99,26 @@ class Assistant:
         str: A message indicating the success or failure of the operation.
         """
         name, phone_number = args
-        answer = input("Would you like to add more info about the contact (Y/n)?:")
+        self.formatter.print_input(
+            "Would you like to add more info about the contact (email, birthday, address) (Y/n)?:"
+        )
+        answer = input()
         if answer == "Y":
-            birthday = input("Birthday:")
-            email = input("Email:")
-            zipp_code = input("Zipp code:")
-            country = input("Country:")
-            city = input("City:")
-            street = input("Street:")
-            building_number = input("Building number:")
-            appartment = input("Appartment:")
-            address = f"{zipp_code}, {country}, {city}, {street}, {building_number}, {appartment}"
-            return self.contacts.add_contact(name, phone_number, email, address, birthday)
+            return self.contacts.add_contact(
+                name,
+                phone_number,
+                self._get_value_request("email (should be like abc.def@gmail.com)"),
+                self._get_value_request("birthday in a format DD.MM.YYYY"),
+                self._get_address_request(),
+            )
         return self.contacts.add_contact(name, phone_number)
-    
+
     def find_contacts(self, args):
         """
         Finds and retrieves contacts based on the provided criteria and value.
 
         Parameters:
-        args (list): A list containing the criteria and value to search for. 
+        args (list): A list containing the criteria and value to search for.
                     The first element is the criteria (e.g., "id", "name"), and the second element is the value to search for.
 
         Returns:
@@ -128,13 +163,93 @@ class Assistant:
         str: A message indicating the success or failure of the operation.
         """
         id, phone_number = args
-        return self.contacts.edit_phone(int(id), phone_number)
+        return self.contacts.edit_phone(id, phone_number)
+
+    @error_handler
+    def find_contacts(self, args):
+        """
+        Find contacts based on the specified criteria and value.
+
+        Parameters:
+        - args (tuple): A tuple containing the criteria and value for the contact search.
+
+        Returns:
+        list: A list of contacts that match the search criteria.
+        """
+        criteria, value = args
+        return self.contacts.find_contacts(criteria, value)
+
+    @error_handler
+    def edit_name(self, args):
+        """
+        Edit the name of a contact with the specified ID.
+
+        Parameters:
+        - args (tuple): A tuple containing the contact ID and the new name.
+
+        Returns:
+        str: A message indicating the success of the name edit.
+        """
+        id, name = args
+        return self.contacts.edit_name(id, name)
+
+    @error_handler
+    def edit_email(self, args):
+        """
+        Edit the email of a contact with the specified ID.
+
+        Parameters:
+        - args (tuple): A tuple containing the contact ID and the new email.
+
+        Returns:
+        str: A message indicating the success of the email edit.
+        """
+        id, email = args
+        return self.contacts.edit_email(id, email)
+
+    @error_handler
+    def edit_birthday(self, args):
+        """
+        Edit the birthday of a contact with the specified ID.
+
+        Parameters:
+        - args (tuple): A tuple containing the contact ID and the new birthday.
+
+        Returns:
+        str: A message indicating the success of the birthday edit.
+        """
+        id, birthday = args
+        return self.contacts.edit_birthday(id, birthday)
 
     @error_handler
     def edit_address(self, args):
+        """
+        Edit the address of a contact with the specified ID.
+
+        Parameters:
+        - args (tuple): A tuple containing the contact ID.
+
+        Returns:
+        str: A message indicating the success of the address edit.
+        """
         id = args[0]
-        address = ", ".join(args[1:])
-        return self.contacts.edit_address(int(id), address)
+        self.contacts.check_contacts_ids_for(id)
+        address = self._get_address_request()
+        return self.contacts.edit_address(id, address)
+
+    @error_handler
+    def show_birthdays(self, args):
+        """
+        Show upcoming birthdays within the specified number of days.
+
+        Parameters:
+        - args (tuple): A tuple containing the number of days for upcoming birthdays.
+
+        Returns:
+        list: A list of contacts with upcoming birthdays.
+        """
+        number_of_days = args[0]
+        return self.contacts.show_birthdays(number_of_days)
 
     @error_handler
     def add_note(self, args):
@@ -165,35 +280,85 @@ class Assistant:
         return self.notes.find_notes(keyword)
 
     @error_handler
-    def show_notes(self):
-        return self.notes.show_notes()
-
-    @error_handler
     def edit_note(self, args):
+        """
+        Edit the content of a note with the specified ID.
+
+        Parameters:
+        - args (list): A list containing the note ID and the new content.
+
+        Returns:
+        str: A message indicating the success of the note edit.
+        """
         id, new_content = args[0], " ".join(args[1:])
         return self.notes.edit_note(id, new_content)
 
     @error_handler
     def delete_note(self, args):
+        """
+        Delete a note with the specified ID.
+
+        Parameters:
+        - args (list): A list containing the note ID.
+
+        Returns:
+        str: A message indicating the success of the note deletion.
+        """
         return self.notes.delete_note(args[0])
 
     @error_handler
     def add_note_tag(self, args):
+        """
+        Add a tag to a note with the specified ID.
+
+        Parameters:
+        - args (list): A list containing the note ID and the tag to be added.
+
+        Returns:
+        str: A message indicating the success of adding the tag to the note.
+        """
         id, tag = args
         return self.notes.add_note_tag(id, tag)
 
     @error_handler
     def delete_note_tag(self, args):
+        """
+        Delete a tag from a note with the specified ID.
+
+        Parameters:
+        - args (list): A list containing the note ID and the tag to be deleted.
+
+        Returns:
+        str: A message indicating the success of deleting the tag from the note.
+        """
         id, tag = args
         return self.notes.delete_note_tag(id, tag)
 
     @error_handler
     def edit_note_tag(self, args):
+        """
+        Edit a tag for a note with the specified ID.
+
+        Parameters:
+        - args (list): A list containing the note ID, the existing tag, and the new tag.
+
+        Returns:
+        str: A message indicating the success of editing the tag for the note.
+        """
         id, tag, new_tag = args
         return self.notes.edit_note_tag(id, tag, new_tag)
 
     @error_handler
     def find_notes_by_tag(self, args):
+        """
+        Find notes that have the specified tag.
+
+        Parameters:
+        - args (list): A list containing the tag to search for.
+
+        Returns:
+        list: A list of notes that have the specified tag.
+        """
         return self.notes.find_notes_by_tag(args[0])
 
 
@@ -230,6 +395,8 @@ def run():
                 formatter.print_table(assistant.find_contacts(args))
             elif command == "add-note":
                 formatter.print_info(assistant.add_note(args))
+            elif command == "edit-name":
+                formatter.print_info(assistant.edit_name(args))
             elif command == "edit-phone":
                 formatter.print_info(assistant.edit_phone(args))
             elif command == "edit-email":

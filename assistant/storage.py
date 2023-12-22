@@ -59,8 +59,7 @@ class PersistantStorage(UserList):
             self.__dict_file_handle = self.__open_file("r+")
             self.__csv_processor = csv.DictReader(self.__dict_file_handle)
             for row in self.__csv_processor:
-                self.data.append(self.load_type(
-                    *(row[field] for field in self.fields)))
+                self.data.append(self.load_type(*(row[field] for field in self.fields)))
 
         except FileNotFoundError:
             self.__dict_file_handle = self.__open_file("w")
@@ -84,6 +83,7 @@ class PersistantStorage(UserList):
         Parameters:
         data_change_func (function): The function that changes the data.
         """
+
         def wrapper(self, *args):
             result = data_change_func(self, *args)
             if self.__dict_file_handle and self.data:

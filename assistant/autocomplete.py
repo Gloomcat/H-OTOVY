@@ -32,7 +32,7 @@ class SpaceAwareCompleter(Completer):
             document (Document): The current document/input where completion is being performed.
             complete_event (CompleteEvent): The completion event triggering this method.
         """
-        if ' ' in document.text_before_cursor:
+        if " " in document.text_before_cursor:
             return
         yield from self.word_completer.get_completions(document, complete_event)
 
@@ -62,7 +62,9 @@ class AutoCompleter:
         word_completer = WordCompleter(command_list, ignore_case=True)
         self.custom_completer = SpaceAwareCompleter(word_completer)
         self.bindings = self._setup_key_bindings()
-        self.session = PromptSession(completer=self.custom_completer, key_bindings=self.bindings)
+        self.session = PromptSession(
+            completer=self.custom_completer, key_bindings=self.bindings
+        )
 
     def _setup_key_bindings(self):
         """
@@ -91,7 +93,7 @@ class AutoCompleter:
 
         return bindings
 
-    def get_user_input(self, prompt_message=''):
+    def get_user_input(self, prompt_message=""):
         """
         Gets user input from the prompt with auto-completion.
 

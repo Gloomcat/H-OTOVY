@@ -2,15 +2,7 @@ import re
 from abc import abstractmethod
 from datetime import datetime
 
-
-class FieldError(Exception):
-    """
-    Exception raised for errors in the Field input.
-
-    Attributes:
-        message (str): Explanation of the error.
-    """
-    pass
+from error_handler import FieldValidationError
 
 
 class _Field:
@@ -52,7 +44,7 @@ class _Field:
         FieldError: If the value does not pass the validation.
         """
         if self.validation_func and not self.validation_func(value):
-            raise FieldError(self.validation_fail_msg())
+            raise FieldValidationError(self.validation_fail_msg())
         self.__value = value
 
     def __str__(self):
@@ -90,16 +82,20 @@ class Id(_Field):
     A field representing an Id, extending _Field.
     """
 
-    def __init__(self, value):
+    def __init__(self, value: (int, str)):
         """
         Initializes a new Id instance with the provided value.
 
         Parameters:
         value (str, int): The initial Id value, which will be converted to 'int' if needed.
         """
-        super().__init__(int(value) if isinstance(value, str) else value)
+        try:
+            value = int(value) if isinstance(value, str) else value
+            super().__init__(value)
+        except ValueError:
+            raise FieldValidationError(self.validation_fail_msg())
 
-    def validation_func(self, value):
+    def validation_func(self, value: (int, str)):
         """
         Validates whether the value is an integer.
 
@@ -132,7 +128,7 @@ class Name(_Field):
     A field representing a Name, extending _Field.
     """
 
-    def __init__(self, value):
+    def __init__(self, value: str):
         """
         Initializes a new Name instance with the provided value.
 
@@ -141,7 +137,7 @@ class Name(_Field):
         """
         super().__init__(value.lower().capitalize())
 
-    def validation_func(self, value):
+    def validation_func(self, value: str):
         """
         Validates whether the value contains only letters.
 
@@ -161,34 +157,33 @@ class Name(_Field):
         str: A message indicating that the name should contain only letters.
         """
         return "Name should contain only letters."
-    
-    
-class Birthday(_Field):
-    def __init__(self, value):
-        super().__init__(value)
 
-    def validation_func(self, value):
+
+class Birthday(_Field):
+    def validation_func(self, value: str):
         if value == "":
             return True
         try:
-            datetime.strptime(value, '%d.%m.%Y')
+            datetime.strptime(value, "%d.%m.%Y")
         except Exception:
             return False
         return True
 
     def validation_fail_msg(self):
-        return "Invalid date format. Use DD.MM.YYYY."
-        
+        return "Invalid birthday date format. Use DD.MM.YYYY."
+
 
 class Email(_Field):
-    def __init__(self, value):
+    def __init__(self, value: str):
         super().__init__(value.lower())
 
-    def validation_func(self, value):
+    def validation_func(self, value: str):
+        if value == "":
+            return True
         return re.match(r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)", value)
 
     def validation_fail_msg(self):
-        return "Email is invalid. Please follow the format: Any.Name.or.Full.name@sub.domain"
+        return "Email is invalid. Please follow the format: Any.Name.or.Full.name@sub.domain."
 
 
 class Phone(_Field):
@@ -196,7 +191,7 @@ class Phone(_Field):
     A field representing a Phone number, extending _Field.
     """
 
-    def validation_func(self, value):
+    def validation_func(self, value: str):
         """
         Validates whether the value is a valid phone number.
 
@@ -206,7 +201,7 @@ class Phone(_Field):
         Returns:
         bool: True if the value is a valid phone number, False otherwise.
         """
-        return re.match(r'\+\d{12}$', value)
+        return re.match(r"\+\d{12}$", value)
 
     def validation_fail_msg(self):
         """
@@ -231,7 +226,7 @@ class Address(_Field):
         """
         super().__init__(", ".join([v.lower().capitalize() for v in value.split(", ")]))
 
-    def validation_func(self, value:str):
+    def validation_func(self, value: str):
         """
         Validates the provided address value.
 
@@ -245,7 +240,7 @@ class Address(_Field):
             return True
         self.pattern = re.compile(r"^[A-Za-z0-9\.\-\s\,]+$")
         return self.pattern.match(value)
-    
+
     def validation_fail_msg(self):
         """
         Returns an error message for address validation failure.

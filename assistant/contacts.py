@@ -1,9 +1,18 @@
-from collections import UserDict, defaultdict
+from collections import UserDict
 from datetime import datetime
-import calendar
 
-from fields import FieldError, Id, Name, Phone, Email, Birthday, Address
+from fields import Id, Name, Phone, Email, Birthday, Address
 from storage import PersistantStorage
+from error_handler import (
+    EmptyContactsError,
+    InvalidNoteOrContactIDError,
+    NameIsExistError,
+    PhoneIsExistError,
+    EmailIsExistError,
+    NoResultsFoundError,
+    InvalidBirthdayDaysParameter,
+    FieldValidationError,
+)
 
 
 class Record(UserDict):
@@ -74,7 +83,7 @@ class Record(UserDict):
         """
         try:
             self.data["id"] = Id(id)
-        except FieldError as e:
+        except FieldValidationError as e:
             raise e
 
     @property
@@ -97,7 +106,7 @@ class Record(UserDict):
         """
         try:
             self.data["name"] = Name(name)
-        except FieldError as e:
+        except FieldValidationError as e:
             raise e
 
     @property
@@ -120,7 +129,7 @@ class Record(UserDict):
         """
         try:
             self.data["phone"] = Phone(phone)
-        except FieldError as e:
+        except FieldValidationError as e:
             raise e
 
     @property
@@ -142,8 +151,8 @@ class Record(UserDict):
         email (str): The email address to be set.
         """
         try:
-            self.data["email"] = Email(email) if email else ""
-        except FieldError as e:
+            self.data["email"] = Email(email)
+        except FieldValidationError as e:
             raise e
 
     @property
@@ -166,7 +175,7 @@ class Record(UserDict):
         """
         try:
             self.data["birthday"] = Birthday(birthday)
-        except FieldError as e:
+        except FieldValidationError as e:
             raise e
 
     @property
@@ -188,14 +197,11 @@ class Record(UserDict):
         address (str): The address to be set.
         """
         try:
-            self.data["address"] = Address(address) if address else ""
-        except FieldError as e:
+            self.data["address"] = Address(address)
+        except FieldValidationError as e:
             raise e
 
-    def __repr__(self):
-         return f"{self.id} {self.name} {self.phone} {self.email} {self.address} {self.birthday}"
-    
-    
+
 class ContactsBook(PersistantStorage):
     """
     A class representing a contacts book, storing and managing a collection of contacts.
@@ -210,63 +216,225 @@ class ContactsBook(PersistantStorage):
         """
         Initializes a new ContactsBook instance with specified column headers and record type.
         """
-        super().__init__("contacts.csv", [
-            "id", "name", "phone", "email", "birthday", "address"], Record)
+        super().__init__(
+            "contacts.csv",
+            ["id", "name", "phone", "email", "birthday", "address"],
+            Record,
+        )
 
-    @PersistantStorage.update
-    def add_contact(self, name, phone, email="", address="", birthday=""):
+    def _get_available_ids(self):
         """
-        Adds a new contact to the contacts book.
-
-        Parameters:
-        name (str): The name of the contact to be added.
-        phone (str): The phone number of the contact to be added.
+        Get the available contact IDs.
 
         Returns:
-        str: A message indicating the success or failure of the operation.
+        tuple: A tuple containing the available contact IDs.
         """
-        if any(record.phone == phone for record in self.data):
-            # raise according Error from error_handler.py in case the phone already exists
-            return "Contact with the phone already exists."
-        if any(record.name == name for record in self.data):
-            # raise according Error from error_handler.py in case the name already exists
-            return "Contact with the name already exists."
+        if not self.data:
+            return ()
+        return tuple(range(0, len(self.data)))
+
+    def _update_ids(self):
+        """
+        Update the IDs of all contacts in the storage to match their current positions.
+
+        This function is typically called after contacts have been added or deleted, ensuring
+        that the IDs of the remaining contacts reflect their sequential order in the storage.
+
+        Returns:
+        None
+        """
+        for id in range(len(self.data)):
+            self.data[id].id = id
+
+    def _check_phone_uniqueness(self, phone: str):
+        """
+        Check if a contact with the specified phone number already exists.
+
+        Parameters:
+        - phone (str): The phone number to be checked.
+
+        Raises:
+        - PhoneIsExistError: If a contact with the specified phone number already exists.
+        """
+        if any(str(record.phone) == phone for record in self.data):
+            raise PhoneIsExistError(f"Contact with the phone: {phone} already exists.")
+
+    def _check_name_uniqueness(self, name: str):
+        """
+        Check if a contact with the specified name already exists.
+
+        Parameters:
+        - name (str): The name to be checked.
+
+        Raises:
+        - NameIsExistError: If a contact with the specified name already exists.
+        """
+        if any(str(record.name) == name for record in self.data):
+            raise NameIsExistError(f"Contact with the name: {name} already exists.")
+
+    def _check_email_uniqueness(self, email: str):
+        """
+        Check if a contact with the specified email already exists.
+
+        Parameters:
+        - email (str): The email to be checked.
+
+        Raises:
+        - EmailIsExistError: If a contact with the specified email already exists.
+        """
+        if any(str(record.email) == email for record in self.data):
+            raise EmailIsExistError(f"Contact with the email: {email} already exists.")
+
+    def _check_empty_result(self, content: list):
+        """
+        Check if the search result is empty.
+
+        Parameters:
+        - content (list): The content to be checked.
+
+        Raises:
+        - NoResultsFoundError: If the content is empty.
+        """
+        if not content or content == []:
+            raise NoResultsFoundError("Error: No contacts found during search.")
+
+    def _check_days_parameter(self, days: str):
+        """
+        Check if the provided days parameter is a valid number.
+
+        Parameters:
+        - days (str): The days parameter to be checked.
+
+        Raises:
+        - InvalidBirthdayDaysParameter: If the days parameter is not a valid number.
+        """
+        if not days or not days.isnumeric():
+            raise InvalidBirthdayDaysParameter(
+                "Error: Days count parameter must be a valid number."
+            )
+
+    def check_contacts_ids_for(self, id: str = None):
+        """
+        Check if the provided contact ID is valid.
+
+        Parameters:
+        - id (str): The contact ID to be checked. Defaults to None.
+
+        Raises:
+        - EmptyContactsError: If the contacts list is empty.
+        - InvalidNoteOrContactIDError: If the provided contact ID is invalid.
+
+        Returns:
+        int: The validated contact ID.
+        """
+        if id:
+            id = Id(id).value
+        ids = self._get_available_ids()
+        if not ids:
+            raise EmptyContactsError("Error: Contacts list is empty.")
+        if id and id not in ids:
+            error_msg = f"Error: Invalid contact Id. Possible Id: 0."
+            if len(ids) > 1:
+                error_msg = error_msg[:-1] + f"-{len(ids)-1}"
+            raise InvalidNoteOrContactIDError(error_msg)
+        return id
+
+    def check_contacts_ids(self):
+        """
+        Check if any contact IDs are available.
+
+        Raises:
+        - EmptyContactsError: If the contacts list is empty.
+
+        Returns:
+        tuple: A tuple containing the available contact IDs.
+        """
+        return self.check_contacts_ids_for(None)
+
+    @PersistantStorage.update
+    def add_contact(
+        self,
+        name: str,
+        phone: str,
+        email: str = "",
+        birthday: str = "",
+        address: str = "",
+    ):
+        """
+        Add a new contact with the specified details.
+
+        Parameters:
+        - name (str): The name of the contact.
+        - phone (str): The phone number of the contact.
+        - email (str): The email of the contact (optional).
+        - birthday (str): The birthday of the contact (optional).
+        - address (str): The address of the contact (optional).
+
+        Raises:
+        - NameIsExistError: If a contact with the same name already exists.
+        - PhoneIsExistError: If a contact with the same phone number already exists.
+        - EmailIsExistError: If a contact with the same email already exists.
+
+        Returns:
+        str: A message indicating the success of adding the contact.
+        """
+        self._check_name_uniqueness(name)
+        self._check_phone_uniqueness(phone)
+        if email:
+            self._check_email_uniqueness(email)
         id = len(self.data)
-        if email and address and birthday:
-            record = Record(id, name, phone, email, birthday, address)
-        else:
-            record = Record(id, name, phone)
+        record = Record(id, name, phone, email, birthday, address)
         self.data.append(record)
-        return "Contact added successfully."
-    
+        return f"Contact added successfully with Id: {id}."
+
     @PersistantStorage.update
-    def delete_contact(self, id):
+    def delete_contact(self, id: str):
         """
-        Deletes a contact based on the provided ID.
+        Delete a contact with the specified ID.
 
         Parameters:
-        id (int): The ID of the contact to be deleted.
+        - id (str): The ID of the contact to be deleted.
+
+        Raises:
+        - InvalidNoteOrContactIDError: If the provided contact ID is invalid.
 
         Returns:
-        str: A message indicating the success or failure of the deletion operation.
+        str: A message indicating the success of deleting the contact.
         """
-        records = list(filter(lambda record: record["id"] == id, self.data))
-        if not records:
-            return "Contact with Id doesn't exist!"
-        self.data.remove(records[0])
-        return "Contact was deleted."
-    
+        id = self.check_contacts_ids_for(id)
+        self.data.pop(id)
+        self._update_ids()
+        return f"Contact with Id: {id} successfully deleted."
+
+    def show_contacts(self):
+        """
+        Show all contacts.
+
+        Raises:
+        - EmptyContactsError: If the contacts list is empty.
+
+        Returns:
+        list: A list containing all contacts.
+        """
+        self.check_contacts_ids()
+        return self.data
+
     def find_contacts(self, criteria, value):
         """
-        Finds and retrieves contacts based on the specified criteria and value.
+        Find contacts based on the specified criteria and value.
 
         Parameters:
-        criteria (str): The criteria to search for contacts. Acceptable values: "id", "name", "phone", "email", "birthday", "address".
-        value (str): The value to search for within the specified criteria.
+        - criteria (str): The criteria for the contact search.
+        - value (str): The value to search for.
+
+        Raises:
+        - EmptyContactsError: If the contacts list is empty.
+        - NoResultsFoundError: If no contacts are found with the specified criteria and value.
 
         Returns:
-        list: A list containing the contacts that match the specified criteria and value.
+        list: A list of contacts that match the search criteria.
         """
+        self.check_contacts_ids()
         result = []
         if criteria in ("id", "name", "phone", "email", "birthday", "address"):
             for record in self.data:
@@ -276,95 +444,152 @@ class ContactsBook(PersistantStorage):
         self._check_empty_result(result)
         return result
 
-    def show_contacts(self):
-        """
-        Retrieves and returns the list of contacts.
-
-        Returns:
-        list: A list containing the contacts.
-        """
-        return self.data
-
     @PersistantStorage.update
-    def edit_phone(self, id, phone):
-        id = Id(id)
+    def edit_name(self, id: str, name: str):
         """
-        Edits the phone number of an existing contact in the contacts book.
+        Edit the name of a contact with the specified ID.
 
         Parameters:
-        id (int): The id of the contact whose phone number needs to be updated.
-        phone (str): The new phone number to be set for the contact.
+        - id (str): The ID of the contact to be edited.
+        - name (str): The new name for the contact.
+
+        Raises:
+        - InvalidNoteOrContactIDError: If the provided contact ID is invalid.
+        - NameIsExistError: If a contact with the new name already exists.
 
         Returns:
-        str: A message indicating the success or failure of the operation.
+        str: A message indicating the success of editing the name.
         """
-        records = list(filter(lambda record: record["id"] == id, self.data))
-        if not records:
-            return "Contact with Id doesn't exist"
-        if len(records) > 1:
-            return "Error: duplicate id found"
-        records[0].phone = phone
-        return f"Phone update for contact with Id: {id}"
-    
+        id = self.check_contacts_ids_for(id)
+        self._check_name_uniqueness(name)
+        self.data[id].name = name
+        return f"Name successfully updated for contact with Id: {id}"
+
+    @PersistantStorage.update
+    def edit_phone(self, id: str, phone: str):
+        """
+        Edit the phone number of a contact with the specified ID.
+
+        Parameters:
+        - id (str): The ID of the contact to be edited.
+        - phone (str): The new phone number for the contact.
+
+        Raises:
+        - InvalidNoteOrContactIDError: If the provided contact ID is invalid.
+        - PhoneIsExistError: If a contact with the new phone number already exists.
+
+        Returns:
+        str: A message indicating the success of editing the phone number.
+        """
+        id = self.check_contacts_ids_for(id)
+        self._check_phone_uniqueness(phone)
+        self.data[id].phone = phone
+        return f"Phone successfully updated for contact with Id: {id}"
+
+    @PersistantStorage.update
+    def edit_email(self, id: str, email: str):
+        """
+        Edit the email of a contact with the specified ID.
+
+        Parameters:
+        - id (str): The ID of the contact to be edited.
+        - email (str): The new email for the contact.
+
+        Raises:
+        - InvalidNoteOrContactIDError: If the provided contact ID is invalid.
+        - EmailIsExistError: If a contact with the new email already exists.
+
+        Returns:
+        str: A message indicating the success of editing the email.
+        """
+        id = self.check_contacts_ids_for(id)
+        self._check_email_uniqueness(email)
+        self.data[id].email = email
+        return f"Email successfully updated for contact with Id: {id}"
+
+    @PersistantStorage.update
+    def edit_address(self, id: str, address: str):
+        """
+        Edit the address of a contact with the specified ID.
+
+        Parameters:
+        - id (str): The ID of the contact to be edited.
+        - address (str): The new address for the contact.
+
+        Raises:
+        - InvalidNoteOrContactIDError: If the provided contact ID is invalid.
+
+        Returns:
+        str: A message indicating the success of editing the address.
+        """
+        id = self.check_contacts_ids_for(id)
+        self.data[id].address = address
+        return f"Address successfully updated for contact with Id: {id}"
+
     @PersistantStorage.update
     def edit_birthday(self, id, birthday):
-        id = Id(id)
-        records = list(filter(lambda record: record["id"] == id, self.data))
+        """
+        Edit the birthday of a contact with the specified ID.
 
-        if not records:
-            return "Contact with Id doesn't exist"
-        if len(records) > 1:
-            return "Error: duplicate id found"
+        Parameters:
+        - id (str): The ID of the contact to be edited.
+        - birthday (str): The new birthday for the contact.
 
-        records[0].birthday = birthday
+        Raises:
+        - InvalidNoteOrContactIDError: If the provided contact ID is invalid.
 
-        return f"Birthday update for contact with Id: {id}"
-    
-    def show_birthdays(self, number_of_days):
+        Returns:
+        str: A message indicating the success of editing the birthday.
+        """
+        id = self.check_contacts_ids_for(id)
+        self.data[id].birthday = birthday
+        return f"Birthday successfully updated for contact with Id: {id}"
+
+    def show_birthdays(self, number_of_days: str):
+        """
+        Show upcoming birthdays within the specified number of days.
+
+        Parameters:
+        - number_of_days (str): The number of days for upcoming birthdays.
+
+        Raises:
+        - EmptyContactsError: If the contacts list is empty.
+        - InvalidBirthdayDaysParameter: If the provided days parameter is not a valid number.
+
+        Returns:
+        list: A list of dictionaries containing the date and names of contacts with upcoming birthdays.
+        """
+        self.check_contacts_ids()
+        self._check_days_parameter(number_of_days)
+
         today = datetime.now()
         birthdays_dict = {}
         number_of_days = int(number_of_days)
 
         for record in self.data:
             if record.birthday:
-                try:
-                    birth_date = datetime.strptime(str(record.birthday), '%d.%m.%Y').replace(year=today.year)
+                birth_date = datetime.strptime(
+                    str(record.birthday), "%d.%m.%Y"
+                ).replace(year=today.year)
 
-                    if birth_date.month == 2 and birth_date.day == 29:
-                        if not (today.year % 4 == 0 and (today.year % 100 != 0 or today.year % 400 == 0)):
-                            birth_date = datetime(today.year, 3, 1)
+                if birth_date.month == 2 and birth_date.day == 29:
+                    if not (
+                        today.year % 4 == 0
+                        and (today.year % 100 != 0 or today.year % 400 == 0)
+                    ):
+                        birth_date = datetime(today.year, 3, 1)
 
-                    delta = (birth_date - today).days
+                delta = (birth_date - today).days
 
-                    if 0 <= delta <= number_of_days:
-                        formatted_birthday = birth_date.strftime('%d.%m.%Y')
-                        if formatted_birthday in birthdays_dict:
-                            birthdays_dict[formatted_birthday].append(str(record.name))
-                        else:
-                            birthdays_dict[formatted_birthday] = [str(record.name)]
-                except ValueError:
-                    continue  
+                if 0 <= delta <= number_of_days:
+                    formatted_birthday = birth_date.strftime("%d.%m.%Y")
+                    if formatted_birthday in birthdays_dict:
+                        birthdays_dict[formatted_birthday].append(str(record.name))
+                    else:
+                        birthdays_dict[formatted_birthday] = [str(record.name)]
 
-        formatted_birthdays = [{"date": date, "names": ', '.join(names)} for date, names in birthdays_dict.items()]
+        formatted_birthdays = [
+            {"date": date, "names": ", ".join(names)}
+            for date, names in birthdays_dict.items()
+        ]
         return formatted_birthdays
-
-    def edit_email(self, id: int, new_email: str):
-        if isinstance(id, int) and isinstance(new_email, str):
-            records = list(filter(lambda record: int(record.id.value) == id, self.data))
-            if not records:
-                return "Contact with Id doesn't exist!"
-            if len(records) > 1:
-                return "Error: duplicate id found"
-            records[0].email = new_email
-            return f"Email updated for contact with Id: {id}"
-        else:
-            return "Id should be number and new_email should be string."
-    
-    @PersistantStorage.update
-    def edit_address(self, id: str, address: str):
-        id = Id(id).value
-        self._check_contacts_ids(id)
-        self.data[id].address = address
-        return f"Address successfully updated for contact with Id: {id}."
-
-
