@@ -164,9 +164,8 @@ class Name(_Field):
     
     
 class Birthday(_Field):
-    def __init__(self, value=None):
+    def __init__(self, value):
         super().__init__(value)
-        self.validation_func(value)
 
     def validation_func(self, value):
         if value == "":
