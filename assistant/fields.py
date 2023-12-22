@@ -2,7 +2,7 @@ import re
 from abc import abstractmethod
 from datetime import datetime
 
-from error_handler import FieldValidationError
+from assistant.error_handler import FieldValidationError
 
 
 class _Field:

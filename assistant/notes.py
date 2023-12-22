@@ -1,9 +1,9 @@
 from datetime import datetime
 from collections import UserDict
 
-from fields import Id
-from storage import PersistantStorage
-from error_handler import (
+from assistant.fields import Id
+from assistant.storage import PersistantStorage
+from assistant.error_handler import (
     InvalidNoteOrContactIDError,
     EmptyNotesError,
     NoResultsFoundError,

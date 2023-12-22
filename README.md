@@ -12,16 +12,21 @@ This Personal Assistant Application is a versatile console-based application des
 - **Persistent Storage:** Saves data in CSV format, ensuring that your information is retained across sessions.
 ​
 ## Installation
-To use this application, ensure you have Python installed on your system and added to your `PATH` environment variable. Some external libraries are required for the core functionality. For enhanced output formatting, install the `rich` library and for the autocomplete feature install `prompt_toolkit` library using following commands:
+To use this application, ensure you have Python installed on your system and added to your `PATH` environment variable. Some external libraries are required for the core functionality. Ensure that you have permissions to run executables with terminal on your current system. Clone the project, switch to project directory and simply run following:
 ```bash
-pip install rich
-pip install prompt_toolkit
+pip install .
+```
+
+## Removal
+Run following command in your system terminal:
+```bash
+pip uninstall assistant
 ```
 ​
 ## Usage
-Run the `main.py` file to start the application:
+Use `personal-assistant` command to start the application from the terminal:
 ```bash
-python main.py
+> personal-assistant
 ```
 Once the application is running, you can use the following commands:
 - Add, view, update, and delete contacts.

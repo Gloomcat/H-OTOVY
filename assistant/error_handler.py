@@ -1,4 +1,4 @@
-from output_formater import OutputFormatter
+from assistant.output_formater import OutputFormatter
 
 
 class KeyboardInputError(Exception):
