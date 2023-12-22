@@ -2,6 +2,7 @@ from contacts import ContactsBook
 from notes import NotesManager
 from help import assistant_help, get_command_list
 from error_handler import input_error_handler, error_handler
+from datetime import datetime
 from output_formater import OutputFormatter
 from autocomplete import AutoCompleter
 
@@ -218,6 +219,10 @@ def run():
                 formatter.print_info(assistant.edit_email(args))
             elif command == "find-notes":
                 formatter.print_table(assistant.find_notes(args))
+            elif command == "edit-birthday":
+                formatter.print_info(assistant.edit_birthday(args))
+            elif command == "show-birthdays":
+                formatter.print_table(assistant.show_birthdays(args))
             elif command == "show-notes":
                 formatter.print_table(assistant.show_notes())
             elif command == "edit-note":

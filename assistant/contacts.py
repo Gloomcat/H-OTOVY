@@ -1,6 +1,8 @@
-from collections import UserDict
+from collections import UserDict, defaultdict
+from datetime import datetime
+import calendar
 
-from fields import FieldError, Id, Name, Phone, Email
+from fields import FieldError, Id, Name, Phone, Email, Birthday
 from storage import PersistantStorage
 
 
@@ -163,7 +165,7 @@ class Record(UserDict):
         birthday (str): The birthday to be set.
         """
         try:
-            self.data["birthday"] = birthday  # Birthday(birthday)
+            self.data["birthday"] = Birthday(birthday)
         except FieldError as e:
             raise e
 
@@ -265,6 +267,7 @@ class ContactsBook(PersistantStorage):
 
     @PersistantStorage.update
     def edit_phone(self, id, phone):
+        id = Id(id)
         """
         Edits the phone number of an existing contact in the contacts book.
 
@@ -283,6 +286,48 @@ class ContactsBook(PersistantStorage):
         records[0].phone = phone
         return f"Phone update for contact with Id: {id}"
     
+    @PersistantStorage.update
+    def edit_birthday(self, id, birthday):
+        id = Id(id)
+        records = list(filter(lambda record: record["id"] == id, self.data))
+
+        if not records:
+            return "Contact with Id doesn't exist"
+        if len(records) > 1:
+            return "Error: duplicate id found"
+
+        records[0].birthday = birthday
+
+        return f"Birthday update for contact with Id: {id}"
+    
+    def show_birthdays(self, number_of_days):
+        today = datetime.now()
+        birthdays_dict = {}
+        number_of_days = int(number_of_days)
+
+        for record in self.data:
+            if record.birthday:
+                try:
+                    birth_date = datetime.strptime(str(record.birthday), '%d.%m.%Y').replace(year=today.year)
+
+                    if birth_date.month == 2 and birth_date.day == 29:
+                        if not (today.year % 4 == 0 and (today.year % 100 != 0 or today.year % 400 == 0)):
+                            birth_date = datetime(today.year, 3, 1)
+
+                    delta = (birth_date - today).days
+
+                    if 0 <= delta <= number_of_days:
+                        formatted_birthday = birth_date.strftime('%d.%m.%Y')
+                        if formatted_birthday in birthdays_dict:
+                            birthdays_dict[formatted_birthday].append(str(record.name))
+                        else:
+                            birthdays_dict[formatted_birthday] = [str(record.name)]
+                except ValueError:
+                    continue  
+
+        formatted_birthdays = [{"date": date, "names": ', '.join(names)} for date, names in birthdays_dict.items()]
+        return formatted_birthdays
+
     def edit_email(self, id: int, new_email: str):
         if isinstance(id, int) and isinstance(new_email, str):
             records = list(filter(lambda record: int(record.id.value) == id, self.data))
@@ -294,4 +339,4 @@ class ContactsBook(PersistantStorage):
             return f"Email updated for contact with Id: {id}"
         else:
             return "Id should be number and new_email should be string."
-
+        

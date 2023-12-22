@@ -1,5 +1,6 @@
 import re
 from abc import abstractmethod
+from datetime import datetime
 
 
 class FieldError(Exception):
@@ -160,6 +161,24 @@ class Name(_Field):
         str: A message indicating that the name should contain only letters.
         """
         return "Name should contain only letters."
+    
+    
+class Birthday(_Field):
+    def __init__(self, value):
+        super().__init__(value)
+
+    def validation_func(self, value):
+        if value == "":
+            return True
+        try:
+            datetime.strptime(value, '%d.%m.%Y')
+        except Exception:
+            return False
+        return True
+
+    def validation_fail_msg(self):
+        return "Invalid date format. Use DD.MM.YYYY."
+        
 
 class Email(_Field):
     def __init__(self, value):

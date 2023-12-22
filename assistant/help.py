@@ -21,7 +21,7 @@ def assistant_help():
         {
             "command": "edit-birthday",
             "arguments": "<id> <birthday>",
-            "description": "Updates the birthday for the contact with the specified ID. Use the format YYYY-MM-DD."
+            "description": "Updates the birthday for the contact with the specified ID. Use the format DD.MM.YYYY."
         },
         {
             "command": "edit-email",
