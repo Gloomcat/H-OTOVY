@@ -21,7 +21,7 @@ setup(
     url="https://github.com/Gloomcat/H-OTOVY",
     python_requires=">=3.7, <4",
     packages=find_packages(),
-    install_requires=["rich"],
+    install_requires=["rich, prompt_toolkit"],
     entry_points={
         "console_scripts": [
             "personal-assistant=assistant.main:run",

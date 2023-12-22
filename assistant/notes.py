@@ -1,9 +1,16 @@
 from datetime import datetime
 from collections import UserDict
 
-from fields import FieldError, Id
+from fields import Id
 from storage import PersistantStorage
-from error_handler import InvalidNoteOrContactIDError, EmptyNotesError, NoResultsFoundError, TagIsPresentError, TagIsAbsentError
+from error_handler import (
+    InvalidNoteOrContactIDError,
+    EmptyNotesError,
+    NoResultsFoundError,
+    TagIsPresentError,
+    TagIsAbsentError,
+    FieldValidationError,
+)
 
 
 class Note(UserDict):
@@ -16,7 +23,7 @@ class Note(UserDict):
         data (dict): A dictionary to store the note's information.
     """
 
-    def __init__(self, id: int, timestamp: str, content: str, tags = ""):
+    def __init__(self, id: int, timestamp: str, content: str, tags=""):
         """
         Initializes a new Note instance.
 
@@ -53,7 +60,7 @@ class Note(UserDict):
         """
         try:
             self.data["id"] = Id(id)
-        except FieldError as e:
+        except FieldValidationError as e:
             raise e
 
     @property
@@ -168,7 +175,10 @@ class NotesManager(PersistantStorage):
         if not ids:
             raise EmptyNotesError("Error: Notes list is empty.")
         if id and id not in ids:
-            raise InvalidNoteOrContactIDError(f"Error: Invalid note Id. Possible Ids: 0-{len(ids) - 1}.")
+            error_msg = f"Error: Invalid note Id. Possible Ids: 0."
+            if len(ids) > 1:
+                error_msg = error_msg[:-1] + f"-{len(ids)-1}"
+            raise InvalidNoteOrContactIDError(error_msg)
 
     def _check_empty_result(self, content: list):
         """
@@ -202,9 +212,13 @@ class NotesManager(PersistantStorage):
         tags = self.data[id].tags
         if must_exist:
             if tag not in tags:
-                raise TagIsAbsentError(f"Error: Tag '{tag}' is not present in the note with Id: {id}. Tags are case-sensitive.")
+                raise TagIsAbsentError(
+                    f"Error: Tag '{tag}' is not present in the note with Id: {id}. Tags are case-sensitive."
+                )
         elif tag in tags:
-            raise TagIsPresentError(f"Error: Tag '{tag}' is already added to the note with Id: {id}.")
+            raise TagIsPresentError(
+                f"Error: Tag '{tag}' is already added to the note with Id: {id}."
+            )
 
     @PersistantStorage.update
     def add_note(self, content: str):
@@ -237,8 +251,7 @@ class NotesManager(PersistantStorage):
         list: A list of notes containing the specified keyword.
         """
         result = list(
-            filter(lambda note: keyword.lower()
-                   in note.content.lower(), self.data)
+            filter(lambda note: keyword.lower() in note.content.lower(), self.data)
         )
         self._check_empty_result(result)
         return result
@@ -392,3 +405,19 @@ class NotesManager(PersistantStorage):
                     result.append(note)
         self._check_empty_result(result)
         return result
+
+    # TODO:
+    def sort_notes_by_tags_order(self, tags_order: list[str]):
+        # {
+        #     "command": "sort-notes-by-tag-order",
+        #     "arguments": "<list-of-some-tags>",
+        #     "description": "Sorts notebook contents by tag order provided (ex. [Reminder, Favourite]).\nFor each tag present in the note, it will be closer to start of notebook contents.",
+        # },
+        # tag1, tag2, tag3
+        # tag1, tag2,
+        # tag1, tag3
+        # tag2, tag3
+        # tag1
+        # tag2
+        # tag3
+        pass
