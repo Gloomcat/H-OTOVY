@@ -255,6 +255,26 @@ class ContactsBook(PersistantStorage):
             return "Contact with Id doesn't exist!"
         self.data.remove(records[0])
         return "Contact was deleted."
+    
+    def find_contacts(self, criteria, value):
+        """
+        Finds and retrieves contacts based on the specified criteria and value.
+
+        Parameters:
+        criteria (str): The criteria to search for contacts. Acceptable values: "id", "name", "phone", "email", "birthday", "address".
+        value (str): The value to search for within the specified criteria.
+
+        Returns:
+        list: A list containing the contacts that match the specified criteria and value.
+        """
+        result = []
+        if criteria in ("id", "name", "phone", "email", "birthday", "address"):
+            for record in self.data:
+                prop = getattr(record, criteria)
+                if value in str(prop.value):
+                    result.append(record)
+        self._check_empty_result(result)
+        return result
 
     def show_contacts(self):
         """
