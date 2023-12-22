@@ -1,9 +1,9 @@
-from contacts import ContactsBook
-from notes import NotesManager
-from help import assistant_help, get_command_list
-from error_handler import input_error_handler, error_handler
-from output_formater import OutputFormatter
-from autocomplete import AutoCompleter
+from assistant.contacts import ContactsBook
+from assistant.notes import NotesManager
+from assistant.help import assistant_help, get_command_list
+from assistant.error_handler import input_error_handler, error_handler
+from assistant.output_formater import OutputFormatter
+from assistant.autocomplete import AutoCompleter
 
 
 class Assistant:
