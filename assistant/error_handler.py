@@ -120,6 +120,7 @@ def error_handler(func):
             formatter.print_error(e)
         except (IndexError, ValueError):
             formatter.print_error("Error: Insufficient arguments for command provided. Type 'help' to see valid arguments for the command.")
+            raise e
         except Exception as e:
             formatter.print_error(f"An unexpected error occurred: {e}")
 
