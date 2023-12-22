@@ -1,3 +1,6 @@
+from output_formater import OutputFormatter
+
+
 class ContactNotFoundError(Exception):
     """Raised when a contact is not found."""
     pass
@@ -122,70 +125,121 @@ class UpcomingBirthdaysError(Exception):
 
 
 def error_handler(func):
+    """
+    A decorator function used to handle errors raised by the decorated function.
+
+    It captures specific exceptions raised by the decorated function and formats error messages using an instance of OutputFormatter.
+
+    Parameters:
+    func (function): The function to be decorated.
+
+    Returns:
+    function: The inner function that handles exceptions and returns the result of the decorated function.
+    """
+    formatter = OutputFormatter()
+
     def inner(*args, **kwargs):
+        """
+        Inner function that executes the decorated function and handles specific exceptions.
+
+        Parameters:
+        *args: Variable length argument list for the decorated function.
+        **kwargs: Arbitrary keyword arguments for the decorated function.
+
+        Returns:
+        Varies: The result of the decorated function or None if an exception is caught.
+        """
         try:
             return func(*args, **kwargs)
         except ContactNotFoundError:
-            return "Error: Contact not found."
+            formatter.print_error("Error: Contact not found.")
         except InvalidFormatError:
-            return "Error: Invalid format. Please check your input format."
+            formatter.print_error("Error: Invalid format. Please check your input format.")
         except InvalidCommandArgumentError:
-            return "Error: Invalid command argument. Please provide a valid argument."
+            formatter.print_error("Error: Invalid command argument. Please provide a valid argument.")
         except PhoneIsExistError:
-            return "Error: Phone number already exists. Please use a different phone number."
+            formatter.print_error("Error: Phone number already exists. Please use a different phone number.")
         except InputOutputError:
-            return "Error: Input/output error. There was a problem with input or output operations."
+            formatter.print_error("Error: Input/output error. There was a problem with input or output operations.")
         except IncorrectInputError:
-            return "Error: Incorrect input. Please check your input data."
+            formatter.print_error("Error: Incorrect input. Please check your input data.")
         except InsufficientContactArgumentsError:
-            return "Error: Insufficient arguments in adding contact. Please provide all required information."
+            formatter.print_error(
+                "Error: Insufficient arguments in adding contact. Please provide all required information.")
         except ContactExistsError:
-            return "Error: Contact already exists. Please use a different name or ID."
+            formatter.print_error("Error: Contact already exists. Please use a different name or ID.")
         except InsufficientEditContactArgumentsError:
-            return "Error: Insufficient arguments in editing contact. Please provide all required information."
+            formatter.print_error(
+                "Error: Insufficient arguments in editing contact. Please provide all required information.")
         except InvalidContactIDError:
-            return "Error: Invalid contact ID. Please provide a valid contact ID."
+            formatter.print_error("Error: Invalid contact ID. Please provide a valid contact ID.")
         except InsufficientDeleteContactArgumentsError:
-            return "Error: Insufficient arguments in deleting contact. Please provide all required information."
+            formatter.print_error(
+                "Error: Insufficient arguments in deleting contact. Please provide all required information.")
         except InsufficientNoteArgumentsError:
-            return "Error: Insufficient arguments in note operations. Please provide all required information."
+            formatter.print_error(
+                "Error: Insufficient arguments in note operations. Please provide all required information.")
         except InvalidNoteIDError:
-            return "Error: Invalid note ID. Please provide a valid note ID."
+            formatter.print_error("Error: Invalid note ID. Please provide a valid note ID.")
         except InsufficientSearchCriteriaError:
-            return "Error: Insufficient search criteria. Please provide more criteria."
+            formatter.print_error("Error: Insufficient search criteria. Please provide more criteria.")
         except InvalidSearchCriteriaError:
-            return "Error: Invalid search criteria. Please use valid search criteria."
+            formatter.print_error("Error: Invalid search criteria. Please use valid search criteria.")
         except InsufficientTagArgumentsError:
-            return "Error: Insufficient arguments for adding tags. Please provide all required information."
+            formatter.print_error(
+                "Error: Insufficient arguments for adding tags. Please provide all required information.")
         except InvalidNoteOrContactIDError:
-            return "Error: Invalid note or contact ID for tagging. Please use valid IDs."
+            formatter.print_error("Error: Invalid note or contact ID for tagging. Please use valid IDs.")
         except TagAdditionError:
-            return "Error: Error during tag addition. Please try again."
+            formatter.print_error("Error: Error during tag addition. Please try again.")
         except InsufficientTagSearchArgumentsError:
-            return "Error: Insufficient tag search arguments. Please provide more criteria."
+            formatter.print_error("Error: Insufficient tag search arguments. Please provide more criteria.")
         except InvalidTagError:
-            return "Error: Invalid tags for search. Please use valid tags."
+            formatter.print_error("Error: Invalid tags for search. Please use valid tags.")
         except TagSearchError:
-            return "Error: Error during tag search. Please try again."
+            formatter.print_error("Error: Error during tag search. Please try again.")
         except InvalidDaysFormatError:
-            return "Error: Invalid days format for upcoming birthdays. Please provide a valid format."
+            formatter.print_error("Error: Invalid days format for upcoming birthdays. Please provide a valid format.")
         except UpcomingBirthdaysError:
-            return "Error: Error during calculation of upcoming birthdays. Please try again."
+            formatter.print_error("Error: Error during calculation of upcoming birthdays. Please try again.")
         except Exception as e:
-            return f"An unexpected error occurred: {e}"
+            formatter.print_error(f"An unexpected error occurred: {e}")
 
     return inner
 
 
 def input_error_handler(func):
+    """
+    A decorator function used to handle errors raised by the decorated function.
+
+    It captures specific exceptions raised by the decorated function and formats error messages using an instance of OutputFormatter.
+
+    Parameters:
+    func (function): The function to be decorated.
+
+    Returns:
+    function: The inner function that handles exceptions and returns the result of the decorated function.
+    """
+    formatter = OutputFormatter()
+
     def inner(*args, **kwargs):
+        """
+        Inner function that executes the decorated function and handles specific exceptions.
+
+        Parameters:
+        *args: Variable length argument list for the decorated function.
+        **kwargs: Arbitrary keyword arguments for the decorated function.
+
+        Returns:
+        Varies: The result of the decorated function or None if an exception is caught.
+        """
         try:
             return func(*args, **kwargs)
         except IndexError:
-            return "No command provided. Please enter a command."
+            formatter.print_error("No command provided. Please enter a command.")
         except ValueError as e:
-            return f"Error in command: {e}"
+            formatter.print_error(f"Error in command: {e}")
         except Exception as e:
-            return f"An unexpected error occurred: {e}"
+            formatter.print_error(f"An unexpected error occurred: {e}")
 
     return inner
