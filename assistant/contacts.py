@@ -254,6 +254,15 @@ class ContactsBook(PersistantStorage):
         self.data.remove(records[0])
         return "Contact was deleted."
 
+    def show_contacts(self):
+        """
+        Retrieves and returns the list of contacts.
+
+        Returns:
+        list: A list containing the contacts.
+        """
+        return self.data
+
     def edit_phone(self, id, phone):
         """
         Edits the phone number of an existing contact in the contacts book.

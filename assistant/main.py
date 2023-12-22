@@ -91,6 +91,16 @@ class Assistant:
         return self.contacts.delete_contact(id)
 
     @error_handler
+    def show_contacts(self):
+        """
+        Retrieves and displays the list of contacts.
+
+        Returns:
+        str: A message indicating the success or failure of the operation.
+        """
+        return self.contacts.show_contacts()
+
+    @error_handler
     def edit_phone(self, args):
         """
         Edits the phone number of an existing contact.
@@ -177,6 +187,8 @@ def run():
                 formatter.print_info(assistant.add_contact(args))
             elif command == "delete-contact":
                 formatter.print_info(assistant.delete_contact(args))
+            elif command == "show-contacts":
+                formatter.print_table(assistant.show_contacts())
             elif command == "add-note":
                 formatter.print_info(assistant.add_note(args))
             elif command == "edit-phone":
