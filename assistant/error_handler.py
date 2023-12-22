@@ -204,6 +204,7 @@ def error_handler(func):
             formatter.print_error("Error: Error during calculation of upcoming birthdays. Please try again.")
         except Exception as e:
             formatter.print_error(f"An unexpected error occurred: {e}")
+            raise e
 
     return inner
 
@@ -241,5 +242,6 @@ def input_error_handler(func):
             formatter.print_error(f"Error in command: {e}")
         except Exception as e:
             formatter.print_error(f"An unexpected error occurred: {e}")
+            raise e
 
     return inner

@@ -132,9 +132,8 @@ class Assistant:
 
     @error_handler
     def show_birthdays(self, args):
-        number_of_days = args
+        number_of_days = args[0]
         return self.contacts.show_birthdays(number_of_days)
-        return result
     
     @error_handler
     def show_notes(self):
@@ -168,7 +167,6 @@ def run():
             if command in ["exit", "close"]:
                 formatter.print_greeting(Assistant.FAREWELL_MESSAGE)
                 break
-            # elif: add other commands and according functions
             elif command == "help":
                 formatter.print_table(assistant_help())
             elif command == "add-contact":
@@ -180,12 +178,11 @@ def run():
             elif command == "edit-email":
                 formatter.print_info(assistant.edit_email(args))
             elif command == "find-notes":
-                print(assistant.find_notes(args))
-            elif command == "edit-birthday":
-                print(assistant.edit_birthday(args))
-            elif command == "show-birthdays":
-                print(assistant.show_birthdays(args))
                 formatter.print_table(assistant.find_notes(args))
+            elif command == "edit-birthday":
+                formatter.print_info(assistant.edit_birthday(args))
+            elif command == "show-birthdays":
+                formatter.print_table(assistant.show_birthdays(args))
             elif command == "show-notes":
                 formatter.print_table(assistant.show_notes())
             elif command == "edit-note":

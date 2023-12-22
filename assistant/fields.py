@@ -155,10 +155,22 @@ class Name(_Field):
     
     
 class Birthday(_Field):
-    def __init__(self, value):
-        if not isinstance(value, datetime):
-            raise TypeError("Birthday must be a date in format DD.MM.YYYY.")
+    def __init__(self, value=None):
         super().__init__(value)
+        self.validation_func(value)
+
+    def validation_func(self, value):
+        if value == "":
+            return True
+        try:
+            datetime.strptime(value, '%d.%m.%Y')
+        except Exception:
+            return False
+        return True
+
+    def validation_fail_msg(self):
+        return "Invalid date format. Use DD.MM.YYYY."
+        
 
 class Email(_Field):
     def __init__(self, value):
