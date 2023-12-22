@@ -263,6 +263,7 @@ class ContactsBook(PersistantStorage):
         """
         return self.data
 
+    @PersistantStorage.update
     def edit_phone(self, id, phone):
         """
         Edits the phone number of an existing contact in the contacts book.
