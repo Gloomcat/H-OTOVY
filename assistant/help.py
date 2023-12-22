@@ -99,3 +99,9 @@ def assistant_help():
             "description": "Find notes by the Tag specified."
         }
     ]
+
+def get_command_list():
+    commands = [command["command"] for command in assistant_help()]
+    additional_commands = ['close', 'exit', 'help']
+    commands.extend(additional_commands)
+    return commands
