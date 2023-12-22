@@ -10,18 +10,18 @@ def load_version():
     with open(filename, "rt") as version_file:
         conan_init = version_file.read()
         version = re.search(
-            r"__version__ = '([0-9.]+)'", conan_init).group(1)
+            r"__version__ = \"([0-9.]+)\"", conan_init).group(1)
         return version
 
 
 setup(
     name="assistant",
     version=load_version(),
-    description="Contacts and notes management solution with CLI by H-OTOVY team",
+    description="Personal Assistant with CLI by H-OTOVY team",
     url="https://github.com/Gloomcat/H-OTOVY",
     python_requires=">=3.7, <4",
     packages=find_packages(),
-    install_requires=["rich, prompt_toolkit"],
+    install_requires=["rich", "prompt_toolkit"],
     entry_points={
         "console_scripts": [
             "personal-assistant=assistant.main:run",

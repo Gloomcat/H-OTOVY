@@ -1,9 +1,9 @@
 from collections import UserDict
 from datetime import datetime
 
-from fields import Id, Name, Phone, Email, Birthday, Address
-from storage import PersistantStorage
-from error_handler import (
+from assistant.fields import Id, Name, Phone, Email, Birthday, Address
+from assistant.storage import PersistantStorage
+from assistant.error_handler import (
     EmptyContactsError,
     InvalidNoteOrContactIDError,
     NameIsExistError,
