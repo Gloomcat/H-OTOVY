@@ -75,6 +75,16 @@ class Assistant:
             address = f"{zipp_code}, {country}, {city}, {street}, {building_number}, {appartment}"
             return self.contacts.add_contact(name, phone_number, email, address, birthday)
         return self.contacts.add_contact(name, phone_number)
+    
+    @error_handler
+    def show_contacts(self):
+        """
+        Retrieves and displays the list of contacts.
+
+        Returns:
+        str: A message indicating the success or failure of the operation.
+        """
+        return self.contacts.show_contacts()
 
     @error_handler
     def edit_phone(self, args):
@@ -161,6 +171,8 @@ def run():
                 formatter.print_table(assistant_help())
             elif command == "add-contact":
                 formatter.print_info(assistant.add_contact(args))
+            elif command == "show-contacts":
+                formatter.print_info(assistant.show_contacts())
             elif command == "add-note":
                 formatter.print_info(assistant.add_note(args))
             elif command == "edit-phone":

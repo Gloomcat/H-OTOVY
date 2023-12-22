@@ -236,6 +236,15 @@ class ContactsBook(PersistantStorage):
             record = Record(id, name, phone)
         self.data.append(record)
         return "Contact added successfully."
+    
+    def show_contacts(self):
+        """
+        Retrieves and returns the list of contacts.
+
+        Returns:
+        list: A list containing the contacts.
+        """
+        return self.data
 
     def edit_phone(self, id, phone):
         """
