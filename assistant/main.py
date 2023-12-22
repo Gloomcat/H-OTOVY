@@ -2,6 +2,7 @@ from contacts import ContactsBook
 from notes import NotesManager
 from help import assistant_help
 from error_handler import input_error_handler, error_handler
+from datetime import datetime
 
 
 class Assistant:
@@ -43,9 +44,15 @@ class Assistant:
         result = self.notes.find_notes(keyword)
         return f"Search result: {result}"
     
+    @error_handler
+    def edit_birthday(self, args):
+        id, birthday = args
+        return self.contacts.edit_birthday(id, birthday)
+
+    @error_handler
     def show_birthdays(self, args):
-        until_date = args
-        return self.contacts_book.show_birthdays(until_date)
+        number_of_days = args
+        return self.contacts.show_birthdays(number_of_days)
 
 
 def run():
@@ -70,6 +77,10 @@ def run():
                 print(assistant.edit_phone(args))
             elif command == "find-notes":
                 print(assistant.find_notes(args))
+            elif command == "edit-birthday":
+                print(assistant.edit_birthday(args))
+            elif command == "show-birthdays":
+                print(assistant.show_birthdays(args))
             else:
                 print("Please, provide a correct command.")
 
