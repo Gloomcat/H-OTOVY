@@ -216,3 +216,41 @@ class Phone(_Field):
         str: A message indicating the format for a valid phone number.
         """
         return "Phone number is invalid. Phone should start with '+' sign and contain 12 digits."
+
+
+class Address(_Field):
+    def __init__(self, value: str):
+        """
+        Initializes an Address object.
+
+        Parameters:
+        value (str): The input address value.
+
+        Note:
+        The address is formatted by capitalizing the first letter of each word after splitting by commas.
+        """
+        super().__init__(", ".join([v.lower().capitalize() for v in value.split(", ")]))
+
+    def validation_func(self, value:str):
+        """
+        Validates the provided address value.
+
+        Parameters:
+        value (str): The address value to be validated.
+
+        Returns:
+        bool: True if the address is valid or an empty string, False otherwise.
+        """
+        if value == "":
+            return True
+        self.pattern = re.compile(r"^[A-Za-z0-9\.\-\s\,]+$")
+        return self.pattern.match(value)
+    
+    def validation_fail_msg(self):
+        """
+        Returns an error message for address validation failure.
+
+        Returns:
+        str: Error message indicating the correct format for the address.
+        """
+        return 'Address is incorect, please, try again, use letters, numbers and ".", "/", "-", ".".'

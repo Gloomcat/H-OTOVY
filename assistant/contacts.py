@@ -2,7 +2,7 @@ from collections import UserDict, defaultdict
 from datetime import datetime
 import calendar
 
-from fields import FieldError, Id, Name, Phone, Email, Birthday
+from fields import FieldError, Id, Name, Phone, Email, Birthday, Address
 from storage import PersistantStorage
 
 
@@ -188,7 +188,7 @@ class Record(UserDict):
         address (str): The address to be set.
         """
         try:
-            self.data["address"] = address  # Address(address)
+            self.data["address"] = Address(address) if address else ""
         except FieldError as e:
             raise e
 
@@ -359,4 +359,12 @@ class ContactsBook(PersistantStorage):
             return f"Email updated for contact with Id: {id}"
         else:
             return "Id should be number and new_email should be string."
-        
+    
+    @PersistantStorage.update
+    def edit_address(self, id: str, address: str):
+        id = Id(id).value
+        self._check_contacts_ids(id)
+        self.data[id].address = address
+        return f"Address successfully updated for contact with Id: {id}."
+
+
