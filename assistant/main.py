@@ -75,6 +75,20 @@ class Assistant:
             address = f"{zipp_code}, {country}, {city}, {street}, {building_number}, {appartment}"
             return self.contacts.add_contact(name, phone_number, email, address, birthday)
         return self.contacts.add_contact(name, phone_number)
+    
+    @error_handler
+    def delete_contact(self, args):
+        """
+        Deletes a contact based on the provided ID.
+
+        Parameters:
+        args (list): A list containing the ID of the contact to be deleted.
+
+        Returns:
+        str: A message indicating the success or failure of the deletion operation.
+        """
+        id = args[0]
+        return self.contacts.delete_contact(id)
 
     @error_handler
     def edit_phone(self, args):
@@ -161,6 +175,8 @@ def run():
                 formatter.print_table(assistant_help())
             elif command == "add-contact":
                 formatter.print_info(assistant.add_contact(args))
+            elif command == "delete-contact":
+                formatter.print_info(assistant.delete_contact(args))
             elif command == "add-note":
                 formatter.print_info(assistant.add_note(args))
             elif command == "edit-phone":
