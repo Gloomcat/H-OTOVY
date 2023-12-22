@@ -21,8 +21,7 @@ class Assistant:
     WELCOME_MESSAGE = (
         "Welcome to the Assistant!\n"
         "I am ready to help you manage your contacts and notes.\n"
-        "Type 'help' to see a list of available commands, 'exit' or 'close' to finish the session.\n"
-        "How can I assist you today?"
+        "Type 'help' to see a list of available commands, 'exit' or 'close' to finish the session."
     )
     FAREWELL_MESSAGE = "Goodbye, have a nice day!"
 
@@ -113,6 +112,7 @@ class Assistant:
             )
         return self.contacts.add_contact(name, phone_number)
 
+    @error_handler
     def find_contacts(self, args):
         """
         Finds and retrieves contacts based on the provided criteria and value.
@@ -150,6 +150,16 @@ class Assistant:
         str: A message indicating the success or failure of the operation.
         """
         return self.contacts.show_contacts()
+
+    @error_handler
+    def show_notes(self):
+        """
+        Retrieves and displays the list of notes.
+
+        Returns:
+        str: A message indicating the success or failure of the operation.
+        """
+        return self.notes.show_notes()
 
     @error_handler
     def edit_phone(self, args):
@@ -378,7 +388,11 @@ def run():
         while True:
             formatter.print_input("Enter a command, please: ")
             user_input = auto_completer.get_user_input()
-            command, *args = assistant.parse_input(user_input)
+            try:
+                command, *args = assistant.parse_input(user_input)
+            except TypeError:
+                # raised only when exception was handled in @input_error_handler
+                continue
 
             if command in ["exit", "close"]:
                 formatter.print_greeting(Assistant.FAREWELL_MESSAGE)

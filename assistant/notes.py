@@ -10,6 +10,7 @@ from error_handler import (
     TagIsPresentError,
     TagIsAbsentError,
     FieldValidationError,
+    EmptyNoteError
 )
 
 
@@ -193,6 +194,19 @@ class NotesManager(PersistantStorage):
         if not content or content == []:
             raise NoResultsFoundError("Error: No notes found during search.")
 
+    def _check_empty_content(self, content: str):
+        """
+        Check if the note contents are empty.
+
+        Parameters:
+        - content (str): The contents to be checked.
+
+        Raises:
+        - EmptyNoteError: If the note contents are empty.
+        """
+        if not content or content == "":
+            raise EmptyNoteError("Error: Contents should not be empty.")
+
     def _check_tag_exists(self, id: str, tag: str, must_exist: bool):
         """
         Check if a tag exists for a given note ID.
@@ -228,9 +242,13 @@ class NotesManager(PersistantStorage):
         Parameters:
         - content (str): The content of the new note.
 
+        Raises:
+        - EmptyNoteError: If the note is empty.
+
         Returns:
         str: A message indicating the success of adding the note.
         """
+        self._check_empty_content(content)
         id = len(self.data)
         timestamp = datetime.now().strftime("%d.%m.%Y %H:%M:%S")
         note = Note(id, timestamp, content)
@@ -250,6 +268,7 @@ class NotesManager(PersistantStorage):
         Returns:
         list: A list of notes containing the specified keyword.
         """
+        self._check_empty_content(keyword)
         result = list(
             filter(lambda note: keyword.lower() in note.content.lower(), self.data)
         )
