@@ -10,8 +10,8 @@ def assistant_help():
     return [
         {
             "command": "add-contact",
-            "arguments": "<name> <phone>",
-            "description": "Adds a new contact with the specified name and phone number.",
+            "arguments": "",
+            "description": "Runs user dialog in order to add a new contact.",
         },
         {
             "command": "edit-name",
@@ -35,8 +35,8 @@ def assistant_help():
         },
         {
             "command": "edit-address",
-            "arguments": "<id> <address>",
-            "description": "Updates the physical address for the contact with the specified ID.",
+            "arguments": "<id>",
+            "description": "Runs user dialog to update the physical address for the contact with the specified ID.",
         },
         {
             "command": "delete-contact",
