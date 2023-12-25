@@ -258,6 +258,7 @@ class ContactsBook(PersistantStorage):
         """
         if any(str(record.phone) == phone for record in self.data):
             raise PhoneIsExistError(f"Contact with the phone: {phone} already exists.")
+        phone = Phone(phone)
 
     def check_name_uniqueness(self, name: str):
         """
@@ -271,6 +272,7 @@ class ContactsBook(PersistantStorage):
         """
         if any(str(record.name) == name for record in self.data):
             raise NameIsExistError(f"Contact with the name: {name} already exists.")
+        name = Name(name)
 
     def _check_email_uniqueness(self, email: str):
         """
@@ -284,6 +286,7 @@ class ContactsBook(PersistantStorage):
         """
         if any(str(record.email) == email for record in self.data):
             raise EmailIsExistError(f"Contact with the email: {email} already exists.")
+        email = Email(email)
 
     def _check_empty_result(self, content: list):
         """
