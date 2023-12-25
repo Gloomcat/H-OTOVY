@@ -135,7 +135,7 @@ class Name(_Field):
         Parameters:
         value (str): The initial name value, which will be capitalized.
         """
-        super().__init__(value.lower().capitalize())
+        super().__init__(" ".join([v.lower().capitalize() for v in value.split(" ")]))
 
     def validation_func(self, value: str):
         """
@@ -145,9 +145,9 @@ class Name(_Field):
         value: The value to be validated.
 
         Returns:
-        bool: True if the value contains only letters, False otherwise.
+        bool: True if the value contains only letters or spaces, False otherwise.
         """
-        return re.match("^[a-zA-Z]+$", value)
+        return re.match("^[a-zA-Z ]+$", value)
 
     def validation_fail_msg(self):
         """
@@ -156,33 +156,97 @@ class Name(_Field):
         Returns:
         str: A message indicating that the name should contain only letters.
         """
-        return "Name should contain only letters."
+        return "Name should contain only letters and spaces."
 
 
 class Birthday(_Field):
-    def validation_func(self, value: str):
+    """
+    A field representing the birthday of a contact.
+
+    Inherits from _Field class.
+
+    Methods:
+    - validation_func(value: str) -> bool: Validate the provided birthday value.
+    - validation_fail_msg() -> str: Get the validation failure message.
+
+    Attributes:
+    - value (str): The value of the birthday field.
+    """
+
+    def validation_func(self, value: str) -> bool:
+        """
+        Validate the provided birthday value.
+
+        Parameters:
+        - value (str): The birthday value to be validated.
+
+        Returns:
+        bool: True if the validation succeeds, False otherwise.
+        """
         if value == "":
             return True
         try:
-            datetime.strptime(value, "%d.%m.%Y")
+            value = datetime.strptime(value, "%d.%m.%Y")
         except Exception:
+            return False
+        if value > datetime.today():
             return False
         return True
 
-    def validation_fail_msg(self):
-        return "Invalid birthday date format. Use DD.MM.YYYY."
+    def validation_fail_msg(self) -> str:
+        """
+        Get the validation failure message.
+
+        Returns:
+        str: The validation failure message.
+        """
+        return "Invalid birthday date. Format should be DD.MM.YYYY, date should be in the past."
 
 
 class Email(_Field):
+    """
+    A field representing the email address of a contact.
+
+    Inherits from _Field class.
+
+    Methods:
+    - validation_func(value: str) -> bool: Validate the provided email value.
+    - validation_fail_msg() -> str: Get the validation failure message.
+
+    Attributes:
+    - value (str): The value of the email field.
+    """
+
     def __init__(self, value: str):
+        """
+        Initialize an Email object.
+
+        Parameters:
+        - value (str): The initial value of the email field.
+        """
         super().__init__(value.lower())
 
-    def validation_func(self, value: str):
+    def validation_func(self, value: str) -> bool:
+        """
+        Validate the provided email value.
+
+        Parameters:
+        - value (str): The email value to be validated.
+
+        Returns:
+        bool: True if the validation succeeds, False otherwise.
+        """
         if value == "":
             return True
         return re.match(r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)", value)
 
-    def validation_fail_msg(self):
+    def validation_fail_msg(self) -> str:
+        """
+        Get the validation failure message.
+
+        Returns:
+        str: The validation failure message.
+        """
         return "Email is invalid. Please follow the format: Any.Name.or.Full.name@sub.domain."
 
 

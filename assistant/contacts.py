@@ -246,7 +246,7 @@ class ContactsBook(PersistantStorage):
         for id in range(len(self.data)):
             self.data[id].id = id
 
-    def _check_phone_uniqueness(self, phone: str):
+    def check_phone_uniqueness(self, phone: str):
         """
         Check if a contact with the specified phone number already exists.
 
@@ -256,10 +256,12 @@ class ContactsBook(PersistantStorage):
         Raises:
         - PhoneIsExistError: If a contact with the specified phone number already exists.
         """
-        if any(str(record.phone) == phone for record in self.data):
-            raise PhoneIsExistError(f"Contact with the phone: {phone} already exists.")
+        phone = Phone(phone)
+        if any(str(record.phone) == str(phone.value) for record in self.data):
+            raise PhoneIsExistError(
+                f"Contact with the phone: {phone} already exists.")
 
-    def _check_name_uniqueness(self, name: str):
+    def check_name_uniqueness(self, name: str):
         """
         Check if a contact with the specified name already exists.
 
@@ -269,8 +271,10 @@ class ContactsBook(PersistantStorage):
         Raises:
         - NameIsExistError: If a contact with the specified name already exists.
         """
-        if any(str(record.name) == name for record in self.data):
-            raise NameIsExistError(f"Contact with the name: {name} already exists.")
+        name = Name(name)
+        if any(str(record.name) == str(name.value) for record in self.data):
+            raise NameIsExistError(
+                f"Contact with the name: {name} already exists.")
 
     def _check_email_uniqueness(self, email: str):
         """
@@ -282,8 +286,10 @@ class ContactsBook(PersistantStorage):
         Raises:
         - EmailIsExistError: If a contact with the specified email already exists.
         """
-        if any(str(record.email) == email for record in self.data):
-            raise EmailIsExistError(f"Contact with the email: {email} already exists.")
+        email = Email(email)
+        if any(str(record.email) == str(email.value) for record in self.data):
+            raise EmailIsExistError(
+                f"Contact with the email: {email} already exists.")
 
     def _check_empty_result(self, content: list):
         """
@@ -351,14 +357,32 @@ class ContactsBook(PersistantStorage):
         """
         return self.check_contacts_ids_for(None)
 
+    def get_id_for(self, name: str):
+        """
+        Get the ID associated with a contact's name.
+
+        Parameters:
+        - name (str): The name of the contact for which to retrieve the ID.
+
+        Raises:
+        - NoResultsFoundError: If no contact with the specified name is found.
+
+        Returns:
+        int: The ID associated with the contact's name.
+        """
+        result = list(
+            filter(lambda contact: str(contact.name).lower() == name.lower(), self.data)
+        )
+        if not result:
+            raise NoResultsFoundError(f"Error: Id not found for name: {name}")
+        assert len(result) == 1
+        return result[0].id.value
+
     @PersistantStorage.update
     def add_contact(
         self,
         name: str,
         phone: str,
-        email: str = "",
-        birthday: str = "",
-        address: str = "",
     ):
         """
         Add a new contact with the specified details.
@@ -366,24 +390,14 @@ class ContactsBook(PersistantStorage):
         Parameters:
         - name (str): The name of the contact.
         - phone (str): The phone number of the contact.
-        - email (str): The email of the contact (optional).
-        - birthday (str): The birthday of the contact (optional).
-        - address (str): The address of the contact (optional).
-
-        Raises:
-        - NameIsExistError: If a contact with the same name already exists.
-        - PhoneIsExistError: If a contact with the same phone number already exists.
-        - EmailIsExistError: If a contact with the same email already exists.
 
         Returns:
         str: A message indicating the success of adding the contact.
         """
-        self._check_name_uniqueness(name)
-        self._check_phone_uniqueness(phone)
-        if email:
-            self._check_email_uniqueness(email)
+        self.check_name_uniqueness(name)
+        self.check_phone_uniqueness(phone)
         id = len(self.data)
-        record = Record(id, name, phone, email, birthday, address)
+        record = Record(id, name, phone)
         self.data.append(record)
         return f"Contact added successfully with Id: {id}."
 
@@ -461,7 +475,7 @@ class ContactsBook(PersistantStorage):
         str: A message indicating the success of editing the name.
         """
         id = self.check_contacts_ids_for(id)
-        self._check_name_uniqueness(name)
+        self.check_name_uniqueness(name)
         self.data[id].name = name
         return f"Name successfully updated for contact with Id: {id}"
 
@@ -482,7 +496,7 @@ class ContactsBook(PersistantStorage):
         str: A message indicating the success of editing the phone number.
         """
         id = self.check_contacts_ids_for(id)
-        self._check_phone_uniqueness(phone)
+        self.check_phone_uniqueness(phone)
         self.data[id].phone = phone
         return f"Phone successfully updated for contact with Id: {id}"
 
