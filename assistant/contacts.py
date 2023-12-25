@@ -256,9 +256,10 @@ class ContactsBook(PersistantStorage):
         Raises:
         - PhoneIsExistError: If a contact with the specified phone number already exists.
         """
-        if any(str(record.phone) == phone for record in self.data):
-            raise PhoneIsExistError(f"Contact with the phone: {phone} already exists.")
         phone = Phone(phone)
+        if any(str(record.phone) == str(phone.value) for record in self.data):
+            raise PhoneIsExistError(
+                f"Contact with the phone: {phone} already exists.")
 
     def check_name_uniqueness(self, name: str):
         """
@@ -270,9 +271,10 @@ class ContactsBook(PersistantStorage):
         Raises:
         - NameIsExistError: If a contact with the specified name already exists.
         """
-        if any(str(record.name) == name for record in self.data):
-            raise NameIsExistError(f"Contact with the name: {name} already exists.")
         name = Name(name)
+        if any(str(record.name) == str(name.value) for record in self.data):
+            raise NameIsExistError(
+                f"Contact with the name: {name} already exists.")
 
     def _check_email_uniqueness(self, email: str):
         """
@@ -284,9 +286,10 @@ class ContactsBook(PersistantStorage):
         Raises:
         - EmailIsExistError: If a contact with the specified email already exists.
         """
-        if any(str(record.email) == email for record in self.data):
-            raise EmailIsExistError(f"Contact with the email: {email} already exists.")
         email = Email(email)
+        if any(str(record.email) == str(email.value) for record in self.data):
+            raise EmailIsExistError(
+                f"Contact with the email: {email} already exists.")
 
     def _check_empty_result(self, content: list):
         """
