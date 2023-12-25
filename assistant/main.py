@@ -1,3 +1,5 @@
+import re
+
 from contacts import ContactsBook
 from notes import NotesManager
 from help import assistant_help, get_command_list
@@ -48,8 +50,16 @@ class Assistant:
         Returns:
         str: The user-entered value.
         """
-        self.formatter.print_input(f"Enter a {prompt}: ")
-        return input()
+        while True:
+            self.formatter.print_input(f"Enter a {prompt}: ")
+            try:
+                value_input = input()
+            except KeyboardInterrupt:
+                self.formatter.print_error(
+                    "Error: Ctrl + C is not supported on current step."
+                )
+                continue
+            return value_input
 
     @error_handler
     def _get_address_request(self):
@@ -59,17 +69,16 @@ class Assistant:
         Returns:
         str: The formatted address string.
         """
-        return ", ".join(
-            (
-                self._get_value_request(prompt)
-                for prompt in (
-                    "ZIP code",
-                    "country",
-                    "city",
-                    "street (optional: building number, appartment)",
-                )
-            )
-        )
+        values = []
+        for prompt in (
+            "ZIP code",
+            "country",
+            "city",
+            "street (optional: building number, appartment)",
+        ):
+            values.append(self._get_value_request(prompt))
+        values = list(filter(lambda v: v != "", values))
+        return ", ".join(values)
 
     @input_error_handler
     def parse_input(self, user_input):
@@ -87,30 +96,43 @@ class Assistant:
         return cmd, *args
 
     @error_handler
-    def add_contact(self, args):
+    def add_contact(self):
         """
         Adds a new contact to the contacts book.
-
-        Parameters:
-        args (list): A list containing the name and phone number for the new contact.
 
         Returns:
         str: A message indicating the success or failure of the operation.
         """
-        name, phone_number = args
+        name = self._get_value_request(
+            "name (should contain only letters and spaces)")
+        self.contacts.check_name_uniqueness(name)
+        phone = self._get_value_request("phone (should be like +380501234567)")
+        self.contacts.check_phone_uniqueness(phone)
+        result = self.contacts.add_contact(name, phone)
+        self.formatter.print_info(result)
+
         self.formatter.print_input(
             "Would you like to add more info about the contact (email, birthday, address) (Y/n)?:"
         )
         answer = input()
         if answer == "Y":
-            return self.contacts.add_contact(
-                name,
-                phone_number,
-                self._get_value_request("email (should be like abc.def@gmail.com)"),
-                self._get_value_request("birthday in a format DD.MM.YYYY"),
-                self._get_address_request(),
+            id = self.contacts.get_id_for(name)
+            self.formatter.print_info(
+                self.contacts.edit_email(
+                    id,
+                    self._get_value_request(
+                        "email (should be like abc.def@gmail.com)"),
+                )
             )
-        return self.contacts.add_contact(name, phone_number)
+            self.formatter.print_info(
+                self.contacts.edit_birthday(
+                    id, self._get_value_request(
+                        "birthday in a format DD.MM.YYYY")
+                )
+            )
+            self.formatter.print_info(
+                self.contacts.edit_address(id, self._get_address_request())
+            )
 
     @error_handler
     def find_contacts(self, args):
@@ -386,8 +408,14 @@ def run():
         assistant = Assistant(contacts, notes)
 
         while True:
-            formatter.print_input("Enter a command, please: ")
-            user_input = auto_completer.get_user_input()
+            try:
+                formatter.print_input("Enter a command, please: ")
+                user_input = auto_completer.get_user_input()
+            except KeyboardInterrupt:
+                formatter.print_error(
+                    "Error: Ctrl + C is not supported. Use 'close' or 'exit'."
+                )
+                continue
             try:
                 command, *args = assistant.parse_input(user_input)
             except TypeError:
@@ -400,7 +428,7 @@ def run():
             elif command == "help":
                 formatter.print_table(assistant_help())
             elif command == "add-contact":
-                formatter.print_info(assistant.add_contact(args))
+                assistant.add_contact()
             elif command == "delete-contact":
                 formatter.print_info(assistant.delete_contact(args))
             elif command == "show-contacts":
