@@ -1,5 +1,3 @@
-import re
-
 from contacts import ContactsBook
 from notes import NotesManager
 from help import assistant_help, get_command_list
