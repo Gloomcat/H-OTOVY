@@ -352,6 +352,7 @@ class NotesManager(PersistantStorage):
         tags = self.data[id].tags
         tags.append(tag)
         self.data[id].tags = tags
+        self.data[id].timestamp = datetime.now().strftime("%d.%m.%Y %H:%M:%S")
         return f"Tag '{tag}' added to the note with Id: {id}"
 
     @PersistantStorage.update
@@ -420,23 +421,7 @@ class NotesManager(PersistantStorage):
         result = []
         for note in self.data:
             for t in note.tags:
-                if tag == t:
+                if tag.lower() == t.lower():
                     result.append(note)
         self._check_empty_result(result)
         return result
-
-    # TODO:
-    def sort_notes_by_tags_order(self, tags_order: list[str]):
-        # {
-        #     "command": "sort-notes-by-tag-order",
-        #     "arguments": "<list-of-some-tags>",
-        #     "description": "Sorts notebook contents by tag order provided (ex. [Reminder, Favourite]).\nFor each tag present in the note, it will be closer to start of notebook contents.",
-        # },
-        # tag1, tag2, tag3
-        # tag1, tag2,
-        # tag1, tag3
-        # tag2, tag3
-        # tag1
-        # tag2
-        # tag3
-        pass

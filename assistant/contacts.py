@@ -287,6 +287,8 @@ class ContactsBook(PersistantStorage):
         - EmailIsExistError: If a contact with the specified email already exists.
         """
         email = Email(email)
+        if email == "":
+            return
         if any(str(record.email) == str(email.value) for record in self.data):
             raise EmailIsExistError(
                 f"Contact with the email: {email} already exists.")
@@ -450,10 +452,12 @@ class ContactsBook(PersistantStorage):
         """
         self.check_contacts_ids()
         result = []
+        criteria = criteria.lower()
+        value = value.lower()
         if criteria in ("id", "name", "phone", "email", "birthday", "address"):
             for record in self.data:
                 prop = getattr(record, criteria)
-                if value in str(prop.value):
+                if value in str(prop.value).lower():
                     result.append(record)
         self._check_empty_result(result)
         return result
@@ -576,7 +580,7 @@ class ContactsBook(PersistantStorage):
         self.check_contacts_ids()
         self._check_days_parameter(number_of_days)
 
-        today = datetime.now()
+        today = datetime.now().date()
         birthdays_dict = {}
         number_of_days = int(number_of_days)
 
@@ -584,7 +588,9 @@ class ContactsBook(PersistantStorage):
             if str(record.birthday):
                 birth_date = datetime.strptime(
                     str(record.birthday), "%d.%m.%Y"
-                ).replace(year=today.year)
+                ).replace(year=today.year).date()
+                if birth_date < today:
+                    birth_date = birth_date.replace(year=today.year + 1)
 
                 if birth_date.month == 2 and birth_date.day == 29:
                     if not (
@@ -595,7 +601,7 @@ class ContactsBook(PersistantStorage):
 
                 delta = (birth_date - today).days
 
-                if 0 <= delta <= number_of_days:
+                if 0 <= delta < number_of_days:
                     formatted_birthday = birth_date.strftime("%d.%m.%Y")
                     if formatted_birthday in birthdays_dict:
                         birthdays_dict[formatted_birthday].append(str(record.name))

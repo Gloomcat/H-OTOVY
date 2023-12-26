@@ -265,7 +265,7 @@ class Phone(_Field):
         Returns:
         bool: True if the value is a valid phone number, False otherwise.
         """
-        return re.match(r"\+\d{12}$", value)
+        return re.match(r"^\+\d{10,13}$", value)
 
     def validation_fail_msg(self):
         """
@@ -274,7 +274,7 @@ class Phone(_Field):
         Returns:
         str: A message indicating the format for a valid phone number.
         """
-        return "Phone number is invalid. Phone should start with '+' sign and contain 12 digits."
+        return "Phone number is invalid. Phone should start with '+' sign and contain 10-13 digits."
 
 
 class Address(_Field):

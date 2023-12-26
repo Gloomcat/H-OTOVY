@@ -56,7 +56,7 @@ def assistant_help():
         {
             "command": "show-birthdays",
             "arguments": "<days-count-from-today>",
-            "description": "Shows the contacts having birthdays within the specified number of days from today.",
+            "description": "Shows the contacts having birthdays within the specified number of days from today inclusive.",
         },
         {
             "command": "add-note",
